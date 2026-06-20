@@ -86,6 +86,24 @@ class WorkoutExercise {
   final String techniqueNote;
 }
 
+class WorkoutLogData {
+  const WorkoutLogData({
+    required this.feeling,
+    required this.difficulty,
+    required this.hasPain,
+    required this.painNote,
+    required this.cardioCompleted,
+    required this.freeNote,
+  });
+
+  final String feeling;
+  final int difficulty;
+  final bool hasPain;
+  final String painNote;
+  final bool cardioCompleted;
+  final String freeNote;
+}
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -154,7 +172,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.5 — Entrenamiento de hoy',
+                    'MVP v0.1.6 — Registro básico del entrenamiento',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -785,13 +803,28 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-class WorkoutTodayScreen extends StatelessWidget {
+class WorkoutTodayScreen extends StatefulWidget {
   const WorkoutTodayScreen({
     super.key,
     required this.data,
   });
 
   final UserAssessmentData data;
+
+  @override
+  State<WorkoutTodayScreen> createState() => _WorkoutTodayScreenState();
+}
+
+class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
+  final _logFormKey = GlobalKey<FormState>();
+
+  String _feeling = 'Normal';
+  double _difficulty = 5;
+  bool _hasPain = false;
+  bool _cardioCompleted = false;
+
+  final _painNoteController = TextEditingController();
+  final _freeNoteController = TextEditingController();
 
   List<WorkoutExercise> get exercises => const [
         WorkoutExercise(
@@ -844,20 +877,51 @@ class WorkoutTodayScreen extends StatelessWidget {
         ),
       ];
 
-  void _completeWorkout(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text(
-          'Entrenamiento marcado como completado. Próxima versión: guardar progreso real.',
+  @override
+  void dispose() {
+    _painNoteController.dispose();
+    _freeNoteController.dispose();
+    super.dispose();
+  }
+
+  void _completeWorkout() {
+    if (!_logFormKey.currentState!.validate()) {
+      return;
+    }
+
+    final log = WorkoutLogData(
+      feeling: _feeling,
+      difficulty: _difficulty.round(),
+      hasPain: _hasPain,
+      painNote: _painNoteController.text.trim(),
+      cardioCompleted: _cardioCompleted,
+      freeNote: _freeNoteController.text.trim(),
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WorkoutCompletedScreen(
+          data: widget.data,
+          log: log,
         ),
       ),
     );
   }
 
+  String? _painValidator(String? value) {
+    if (!_hasPain) return null;
+
+    if (value == null || value.trim().isEmpty) {
+      return 'Indica dónde has notado la molestia';
+    }
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasNightShiftText =
-        data.hasNightShift ? 'Post-turno nocturno' : 'Horario estándar';
+        widget.data.hasNightShift ? 'Post-turno nocturno' : 'Horario estándar';
 
     return Scaffold(
       appBar: AppBar(
@@ -867,12 +931,254 @@ class WorkoutTodayScreen extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 840),
+            child: Form(
+              key: _logFormKey,
+              child: ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  const Text(
+                    'Full body estratégico',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Fase: Adaptación inteligente. Hoy no buscamos machacarte: buscamos técnica, constancia y una base sólida.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      height: 1.45,
+                      color: Colors.white.withValues(alpha: 0.72),
+                    ),
+                  ),
+                  const SizedBox(height: 22),
+                  _WorkoutSummaryCard(
+                    goal: widget.data.currentGoal,
+                    schedule: hasNightShiftText,
+                  ),
+                  const SizedBox(height: 22),
+                  const _SectionTitle(
+                    icon: Icons.fitness_center_outlined,
+                    title: 'Ejercicios',
+                  ),
+                  const SizedBox(height: 12),
+                  ...exercises.asMap().entries.map(
+                        (entry) => _ExerciseCard(
+                          number: entry.key + 1,
+                          exercise: entry.value,
+                        ),
+                      ),
+                  const SizedBox(height: 18),
+                  const _DashboardCard(
+                    icon: Icons.directions_walk_outlined,
+                    title: 'Cardio suave',
+                    description:
+                        'Después de la fuerza: caminar 15-20 minutos a ritmo cómodo. La prioridad es crear hábito sin reventarte.',
+                    chips: [
+                      '15-20 min',
+                      'Ritmo cómodo',
+                      'Sin impacto',
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  const _DashboardCard(
+                    icon: Icons.warning_amber_outlined,
+                    title: 'Regla de seguridad',
+                    description:
+                        'Si aparece dolor articular raro, mareo, pinchazo fuerte o molestia que cambia tu técnica, paras el ejercicio y lo registramos para adaptarlo.',
+                    chips: [
+                      'Sin ego',
+                      'Técnica primero',
+                      'Progresión gradual',
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const _SectionTitle(
+                    icon: Icons.edit_note_outlined,
+                    title: 'Registro del entrenamiento',
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: _feeling,
+                    decoration: const InputDecoration(
+                      labelText: 'Sensación general',
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Muy mal',
+                        child: Text('Muy mal'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Cansado',
+                        child: Text('Cansado'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Normal',
+                        child: Text('Normal'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Bien',
+                        child: Text('Bien'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Muy bien',
+                        child: Text('Muy bien'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _feeling = value);
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _SliderCard(
+                    title: 'Dificultad percibida',
+                    value: _difficulty,
+                    label: '${_difficulty.round()}/10',
+                    onChanged: (value) {
+                      setState(() => _difficulty = value);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    value: _cardioCompleted,
+                    activeThumbColor: const Color(0xFF00E0A4),
+                    title: const Text(
+                      'He completado el cardio suave',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    subtitle: Text(
+                      'Caminar 15-20 minutos después de la fuerza.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.62),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() => _cardioCompleted = value);
+                    },
+                  ),
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    value: _hasPain,
+                    activeThumbColor: const Color(0xFFFFC857),
+                    title: const Text(
+                      'He notado dolor o molestia',
+                      style: TextStyle(fontWeight: FontWeight.w800),
+                    ),
+                    subtitle: Text(
+                      'Esto servirá para adaptar ejercicios en próximas versiones.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.62),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() => _hasPain = value);
+                    },
+                  ),
+                  if (_hasPain) ...[
+                    const SizedBox(height: 10),
+                    TextFormField(
+                      controller: _painNoteController,
+                      validator: _painValidator,
+                      minLines: 2,
+                      maxLines: 4,
+                      decoration: const InputDecoration(
+                        labelText: 'Dónde has notado la molestia',
+                        hintText: 'Ejemplo: hombro derecho en press de pecho',
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  TextFormField(
+                    controller: _freeNoteController,
+                    minLines: 3,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      labelText: 'Nota libre',
+                      hintText:
+                          'Ejemplo: fui cansado, pero terminé todo con buena técnica.',
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    height: 56,
+                    child: FilledButton(
+                      onPressed: _completeWorkout,
+                      child: const Text(
+                        'Completar y ver resumen',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Volver al panel'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class WorkoutCompletedScreen extends StatelessWidget {
+  const WorkoutCompletedScreen({
+    super.key,
+    required this.data,
+    required this.log,
+  });
+
+  final UserAssessmentData data;
+  final WorkoutLogData log;
+
+  String get recommendation {
+    if (log.hasPain) {
+      return 'Próxima recomendación: revisar el ejercicio donde hubo molestia y preparar una alternativa segura.';
+    }
+
+    if (log.difficulty >= 8) {
+      return 'Próxima recomendación: mantener el mismo nivel. No subimos carga todavía porque la sesión fue dura.';
+    }
+
+    if (log.difficulty <= 4 && log.feeling == 'Muy bien') {
+      return 'Próxima recomendación: podríamos subir ligeramente la exigencia si se repite esta sensación.';
+    }
+
+    return 'Próxima recomendación: repetir estructura y buscar constancia antes de aumentar volumen.';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Entrenamiento completado'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
             child: ListView(
               padding: const EdgeInsets.all(24),
               children: [
-                const Text(
-                  'Full body estratégico',
-                  style: TextStyle(
+                const Icon(
+                  Icons.check_circle_outline,
+                  color: Color(0xFF00E0A4),
+                  size: 64,
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'Buen trabajo, ${data.name}',
+                  style: const TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.8,
@@ -880,72 +1186,57 @@ class WorkoutTodayScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Fase: Adaptación inteligente. Hoy no buscamos machacarte: buscamos técnica, constancia y una base sólida.',
+                  'Este registro será la base para que la app aprenda de tu recuperación, molestias y adherencia.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.45,
                     color: Colors.white.withValues(alpha: 0.72),
                   ),
                 ),
-                const SizedBox(height: 22),
-                _WorkoutSummaryCard(
-                  goal: data.currentGoal,
-                  schedule: hasNightShiftText,
-                ),
-                const SizedBox(height: 22),
-                const _SectionTitle(
-                  icon: Icons.fitness_center_outlined,
-                  title: 'Ejercicios',
-                ),
-                const SizedBox(height: 12),
-                ...exercises.asMap().entries.map(
-                      (entry) => _ExerciseCard(
-                        number: entry.key + 1,
-                        exercise: entry.value,
-                      ),
-                    ),
-                const SizedBox(height: 18),
-                const _DashboardCard(
-                  icon: Icons.directions_walk_outlined,
-                  title: 'Cardio suave',
-                  description:
-                      'Después de la fuerza: caminar 15-20 minutos a ritmo cómodo. La prioridad es crear hábito sin reventarte.',
-                  chips: [
-                    '15-20 min',
-                    'Ritmo cómodo',
-                    'Sin impacto',
+                const SizedBox(height: 24),
+                _DiagnosisCard(
+                  icon: Icons.edit_note_outlined,
+                  title: 'Resumen registrado',
+                  lines: [
+                    'Sensación general: ${log.feeling}',
+                    'Dificultad percibida: ${log.difficulty}/10',
+                    log.cardioCompleted
+                        ? 'Cardio suave completado.'
+                        : 'Cardio suave no completado.',
+                    log.hasPain
+                        ? 'Molestia registrada: ${log.painNote}'
+                        : 'Sin dolor o molestia registrada.',
+                    if (log.freeNote.isNotEmpty) 'Nota: ${log.freeNote}',
                   ],
                 ),
-                const SizedBox(height: 18),
-                const _DashboardCard(
-                  icon: Icons.warning_amber_outlined,
-                  title: 'Regla de seguridad',
-                  description:
-                      'Si aparece dolor articular raro, mareo, pinchazo fuerte o molestia que cambia tu técnica, paras el ejercicio y lo registramos para adaptarlo.',
-                  chips: [
-                    'Sin ego',
-                    'Técnica primero',
-                    'Progresión gradual',
+                _DiagnosisCard(
+                  icon: Icons.psychology_alt_outlined,
+                  title: 'Primera decisión adaptativa',
+                  lines: [
+                    recommendation,
+                    'En próximas versiones este resultado modificará automáticamente el plan.',
                   ],
                 ),
-                const SizedBox(height: 28),
+                const SizedBox(height: 24),
                 SizedBox(
                   height: 56,
                   child: FilledButton(
-                    onPressed: () => _completeWorkout(context),
+                    onPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => DashboardScreen(data: data),
+                        ),
+                        (route) => false,
+                      );
+                    },
                     child: const Text(
-                      'Marcar entrenamiento como completado',
+                      'Volver al panel principal',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 17,
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 14),
-                OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Volver al panel'),
                 ),
               ],
             ),
@@ -1077,6 +1368,57 @@ class _ExerciseCard extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SliderCard extends StatelessWidget {
+  const _SliderCard({
+    required this.title,
+    required this.value,
+    required this.label,
+    required this.onChanged,
+  });
+
+  final String title;
+  final double value;
+  final String label;
+  final ValueChanged<double> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF121821),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$title: $label',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            Slider(
+              min: 1,
+              max: 10,
+              divisions: 9,
+              value: value,
+              label: label,
+              onChanged: onChanged,
             ),
           ],
         ),
