@@ -86,6 +86,20 @@ class WorkoutExercise {
   final String techniqueNote;
 }
 
+class WorkoutTemplate {
+  const WorkoutTemplate({
+    required this.name,
+    required this.subtitle,
+    required this.focus,
+    required this.exercises,
+  });
+
+  final String name;
+  final String subtitle;
+  final String focus;
+  final List<WorkoutExercise> exercises;
+}
+
 class WorkoutLogData {
   const WorkoutLogData({
     required this.feeling,
@@ -94,6 +108,7 @@ class WorkoutLogData {
     required this.painNote,
     required this.cardioCompleted,
     required this.freeNote,
+    required this.workoutName,
   });
 
   final String feeling;
@@ -102,6 +117,7 @@ class WorkoutLogData {
   final String painNote;
   final bool cardioCompleted;
   final String freeNote;
+  final String workoutName;
 }
 
 class NutritionMeal {
@@ -142,6 +158,7 @@ class WeeklyPlanDay {
     required this.description,
     required this.focus,
     required this.icon,
+    this.workoutTemplate,
   });
 
   final String day;
@@ -150,6 +167,188 @@ class WeeklyPlanDay {
   final String description;
   final String focus;
   final IconData icon;
+  final WorkoutTemplate? workoutTemplate;
+}
+
+class AppWorkoutTemplates {
+  static const fullBodyA = WorkoutTemplate(
+    name: 'Full body A',
+    subtitle: 'Base técnica y fuerza general',
+    focus:
+        'Primer entrenamiento de la semana. Prioridad: técnica, control y empezar sin machacarte.',
+    exercises: [
+      WorkoutExercise(
+        name: 'Prensa de piernas',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'Baja controlado, no bloquees las rodillas y mantén la espalda pegada al respaldo.',
+      ),
+      WorkoutExercise(
+        name: 'Jalón al pecho',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'Lleva la barra hacia la parte alta del pecho, sin balancearte y juntando escápulas.',
+      ),
+      WorkoutExercise(
+        name: 'Press de pecho en máquina',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'Empuja fuerte, controla la bajada y evita que los hombros se vayan hacia delante.',
+      ),
+      WorkoutExercise(
+        name: 'Remo sentado en polea',
+        sets: '2',
+        reps: '12',
+        rest: '75 s',
+        techniqueNote:
+            'Tira con la espalda, no con el cuello. Pecho alto y movimiento limpio.',
+      ),
+      WorkoutExercise(
+        name: 'Elevaciones laterales',
+        sets: '2',
+        reps: '12-15',
+        rest: '60 s',
+        techniqueNote:
+            'Sube hasta la línea del hombro, sin impulso y con peso moderado.',
+      ),
+      WorkoutExercise(
+        name: 'Plancha abdominal',
+        sets: '2',
+        reps: '20-30 s',
+        rest: '60 s',
+        techniqueNote:
+            'Aprieta abdomen y glúteos. No hundas la zona lumbar.',
+      ),
+    ],
+  );
+
+  static const fullBodyB = WorkoutTemplate(
+    name: 'Full body B',
+    subtitle: 'Espalda, piernas y estabilidad',
+    focus:
+        'Segunda sesión de fuerza. Mantenemos cuerpo completo, pero cambiamos estímulos para no repetir exactamente lo mismo.',
+    exercises: [
+      WorkoutExercise(
+        name: 'Sentadilla goblet o multipower suave',
+        sets: '3',
+        reps: '10',
+        rest: '90 s',
+        techniqueNote:
+            'Baja hasta donde controles bien. Rodillas estables y torso firme.',
+      ),
+      WorkoutExercise(
+        name: 'Remo en máquina',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'Pecho apoyado si es posible. Tira con codos y evita encoger hombros.',
+      ),
+      WorkoutExercise(
+        name: 'Press inclinado en máquina',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'Controla la bajada y no fuerces el hombro. Rango cómodo y estable.',
+      ),
+      WorkoutExercise(
+        name: 'Curl femoral sentado o tumbado',
+        sets: '2',
+        reps: '12',
+        rest: '75 s',
+        techniqueNote:
+            'Movimiento lento. Nota el trabajo en isquios, no en la zona lumbar.',
+      ),
+      WorkoutExercise(
+        name: 'Face pull en polea',
+        sets: '2',
+        reps: '12-15',
+        rest: '60 s',
+        techniqueNote:
+            'Tira hacia la cara con codos altos. Ejercicio suave para hombro y postura.',
+      ),
+      WorkoutExercise(
+        name: 'Dead bug',
+        sets: '2',
+        reps: '8-10 por lado',
+        rest: '60 s',
+        techniqueNote:
+            'Zona lumbar pegada al suelo. Movimiento lento y controlado.',
+      ),
+    ],
+  );
+
+  static const fullBodyC = WorkoutTemplate(
+    name: 'Full body C',
+    subtitle: 'Cierre semanal y control de fatiga',
+    focus:
+        'Tercera sesión. Cerramos la semana con fuerza útil, técnica limpia y sin buscar el fallo.',
+    exercises: [
+      WorkoutExercise(
+        name: 'Peso muerto rumano con mancuernas ligero',
+        sets: '3',
+        reps: '10',
+        rest: '90 s',
+        techniqueNote:
+            'Cadera atrás, espalda neutra y mancuernas pegadas al cuerpo. Sin dolor lumbar.',
+      ),
+      WorkoutExercise(
+        name: 'Jalón agarre cómodo',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'Usa el agarre que no moleste hombros. Baja controlado hacia el pecho.',
+      ),
+      WorkoutExercise(
+        name: 'Press de pecho convergente o máquina',
+        sets: '3',
+        reps: '10-12',
+        rest: '90 s',
+        techniqueNote:
+            'No busques máximo peso. Estabilidad, control y hombros protegidos.',
+      ),
+      WorkoutExercise(
+        name: 'Extensión de cuádriceps',
+        sets: '2',
+        reps: '12-15',
+        rest: '75 s',
+        techniqueNote:
+            'Sube controlado y baja lento. No bloquees fuerte la rodilla.',
+      ),
+      WorkoutExercise(
+        name: 'Curl bíceps en polea o máquina',
+        sets: '2',
+        reps: '12',
+        rest: '60 s',
+        techniqueNote:
+            'Codos quietos y recorrido limpio. Sin balanceo.',
+      ),
+      WorkoutExercise(
+        name: 'Press tríceps en polea',
+        sets: '2',
+        reps: '12',
+        rest: '60 s',
+        techniqueNote:
+            'Codos pegados al cuerpo. Extiende sin bloquear agresivamente.',
+      ),
+      WorkoutExercise(
+        name: 'Pallof press',
+        sets: '2',
+        reps: '10 por lado',
+        rest: '60 s',
+        techniqueNote:
+            'Resiste la rotación. Abdomen firme y respiración controlada.',
+      ),
+    ],
+  );
 }
 
 class WelcomeScreen extends StatelessWidget {
@@ -174,7 +373,6 @@ class WelcomeScreen extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Icon(
                     Icons.fitness_center,
@@ -220,7 +418,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.9 — Plan semanal básico',
+                    'MVP v0.2.0 — Entrenamientos A / B / C',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -270,9 +468,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
   }
 
   void _generateDiagnosis() {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final data = UserAssessmentData(
       name: _nameController.text.trim(),
@@ -300,13 +496,8 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
 
     final number = num.tryParse(value.replaceAll(',', '.'));
 
-    if (number == null) {
-      return 'Introduce un número válido';
-    }
-
-    if (number <= 0) {
-      return 'El número debe ser mayor que 0';
-    }
+    if (number == null) return 'Introduce un número válido';
+    if (number <= 0) return 'El número debe ser mayor que 0';
 
     return null;
   }
@@ -703,7 +894,10 @@ class DashboardScreen extends StatelessWidget {
   void _goToWorkoutToday(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => WorkoutTodayScreen(data: data),
+        builder: (_) => WorkoutTodayScreen(
+          data: data,
+          workout: AppWorkoutTemplates.fullBodyA,
+        ),
       ),
     );
   }
@@ -762,7 +956,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tu plan inicial ya está preparado. Esta es la primera versión del panel principal.',
+                  'Tu plan inicial ya está preparado. Ahora la semana distingue entrenamientos A, B y C.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.45,
@@ -785,8 +979,8 @@ class DashboardScreen extends StatelessWidget {
                   chips: [
                     '$recommendedStrengthDays días fuerza',
                     if (optionalDay) '1 día opcional',
+                    'A / B / C',
                     'Cardio suave',
-                    'Pasos progresivos',
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -798,13 +992,13 @@ class DashboardScreen extends StatelessWidget {
                 _ActionTile(
                   icon: Icons.calendar_month_outlined,
                   title: 'Ver plan semanal',
-                  subtitle: 'Semana 1 de adaptación inteligente.',
+                  subtitle: 'Semana 1 con entrenamientos A, B y C.',
                   onTap: () => _goToWeeklyPlan(context),
                 ),
                 _ActionTile(
                   icon: Icons.fitness_center_outlined,
                   title: 'Ver entrenamiento de hoy',
-                  subtitle: 'Pantalla de sesión diaria disponible.',
+                  subtitle: 'Por defecto abre Full body A.',
                   onTap: () => _goToWorkoutToday(context),
                 ),
                 _ActionTile(
@@ -829,18 +1023,9 @@ class DashboardScreen extends StatelessWidget {
                   spacing: 12,
                   runSpacing: 12,
                   children: [
-                    _MetricBox(
-                      label: 'Peso',
-                      value: '${data.weightKg} kg',
-                    ),
-                    _MetricBox(
-                      label: 'Cintura',
-                      value: '${data.waistCm} cm',
-                    ),
-                    _MetricBox(
-                      label: 'Objetivo',
-                      value: data.currentGoal,
-                    ),
+                    _MetricBox(label: 'Peso', value: '${data.weightKg} kg'),
+                    _MetricBox(label: 'Cintura', value: '${data.waistCm} cm'),
+                    _MetricBox(label: 'Objetivo', value: data.currentGoal),
                     _MetricBox(
                       label: 'Horario',
                       value: data.hasNightShift
@@ -901,6 +1086,7 @@ class WeeklyPlanScreen extends StatelessWidget {
               'Sesión de cuerpo completo con máquinas y técnica controlada.',
           focus: 'Aprender movimientos, no buscar máximo peso.',
           icon: Icons.fitness_center_outlined,
+          workoutTemplate: AppWorkoutTemplates.fullBodyA,
         ),
         WeeklyPlanDay(
           day: 'Día 2',
@@ -916,9 +1102,10 @@ class WeeklyPlanScreen extends StatelessWidget {
           title: 'Full body B',
           type: 'Fuerza',
           description:
-              'Segunda sesión de fuerza con patrón parecido, pero cuidando fatiga.',
+              'Segunda sesión de fuerza con patrón distinto y control de fatiga.',
           focus: 'Repetir técnica y ganar confianza.',
           icon: Icons.fitness_center_outlined,
+          workoutTemplate: AppWorkoutTemplates.fullBodyB,
         ),
         WeeklyPlanDay(
           day: 'Día 4',
@@ -934,9 +1121,10 @@ class WeeklyPlanScreen extends StatelessWidget {
           title: 'Full body C',
           type: 'Fuerza',
           description:
-              'Tercera sesión de fuerza de la semana. Misma prioridad: técnica y adherencia.',
+              'Tercera sesión de fuerza de la semana. Cierre técnico y controlado.',
           focus: 'Cerrar la semana con buena ejecución.',
           icon: Icons.fitness_center_outlined,
+          workoutTemplate: AppWorkoutTemplates.fullBodyC,
         ),
         WeeklyPlanDay(
           day: 'Día 6',
@@ -957,6 +1145,17 @@ class WeeklyPlanScreen extends StatelessWidget {
           icon: Icons.bedtime_outlined,
         ),
       ];
+
+  void _openWorkout(BuildContext context, WorkoutTemplate workout) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WorkoutTodayScreen(
+          data: data,
+          workout: workout,
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -981,7 +1180,7 @@ class WeeklyPlanScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Esta semana no busca reventarte. Busca construir base, técnica, rutina y recuperación. Si una señal diaria sale mal, el plan debe poder adaptarse.',
+                  'Ahora los días de fuerza tienen sesiones diferentes. Toca el Día 1, Día 3 o Día 5 para abrir su entrenamiento concreto.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.45,
@@ -989,16 +1188,16 @@ class WeeklyPlanScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 22),
-                _DashboardCard(
+                const _DashboardCard(
                   icon: Icons.flag_outlined,
                   title: 'Objetivo de la semana',
                   description:
-                      'Empezar con 3 sesiones de fuerza, cardio suave y hábitos mínimos. La prioridad es adherencia, técnica y control de fatiga.',
+                      'Empezar con 3 sesiones de fuerza diferentes, cardio suave y hábitos mínimos. La prioridad es adherencia, técnica y control de fatiga.',
                   chips: [
-                    '3 fuerza',
+                    'Full body A',
+                    'Full body B',
+                    'Full body C',
                     'Cardio suave',
-                    'Agua',
-                    'Pasos',
                     'Sin machaque',
                   ],
                 ),
@@ -1009,10 +1208,18 @@ class WeeklyPlanScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 ...weekOne.map(
-                  (planDay) => _WeeklyPlanDayCard(day: planDay),
+                  (planDay) => _WeeklyPlanDayCard(
+                    day: planDay,
+                    onTap: planDay.workoutTemplate == null
+                        ? null
+                        : () => _openWorkout(
+                              context,
+                              planDay.workoutTemplate!,
+                            ),
+                  ),
                 ),
                 const SizedBox(height: 18),
-                _DashboardCard(
+                const _DashboardCard(
                   icon: Icons.psychology_alt_outlined,
                   title: 'Regla adaptativa',
                   description:
@@ -1028,15 +1235,12 @@ class WeeklyPlanScreen extends StatelessWidget {
                 SizedBox(
                   height: 56,
                   child: FilledButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => WorkoutTodayScreen(data: data),
-                        ),
-                      );
-                    },
+                    onPressed: () => _openWorkout(
+                      context,
+                      AppWorkoutTemplates.fullBodyA,
+                    ),
                     child: const Text(
-                      'Abrir entrenamiento de hoy',
+                      'Abrir Full body A',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
@@ -1597,9 +1801,11 @@ class WorkoutTodayScreen extends StatefulWidget {
   const WorkoutTodayScreen({
     super.key,
     required this.data,
+    required this.workout,
   });
 
   final UserAssessmentData data;
+  final WorkoutTemplate workout;
 
   @override
   State<WorkoutTodayScreen> createState() => _WorkoutTodayScreenState();
@@ -1616,57 +1822,6 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   final _painNoteController = TextEditingController();
   final _freeNoteController = TextEditingController();
 
-  List<WorkoutExercise> get exercises => const [
-        WorkoutExercise(
-          name: 'Prensa de piernas',
-          sets: '3',
-          reps: '10-12',
-          rest: '90 s',
-          techniqueNote:
-              'Baja controlado, no bloquees las rodillas y mantén la espalda pegada al respaldo.',
-        ),
-        WorkoutExercise(
-          name: 'Jalón al pecho',
-          sets: '3',
-          reps: '10-12',
-          rest: '90 s',
-          techniqueNote:
-              'Lleva la barra hacia la parte alta del pecho, sin balancearte y juntando escápulas.',
-        ),
-        WorkoutExercise(
-          name: 'Press de pecho en máquina',
-          sets: '3',
-          reps: '10-12',
-          rest: '90 s',
-          techniqueNote:
-              'Empuja fuerte, controla la bajada y evita que los hombros se vayan hacia delante.',
-        ),
-        WorkoutExercise(
-          name: 'Remo sentado en polea',
-          sets: '2',
-          reps: '12',
-          rest: '75 s',
-          techniqueNote:
-              'Tira con la espalda, no con el cuello. Pecho alto y movimiento limpio.',
-        ),
-        WorkoutExercise(
-          name: 'Elevaciones laterales',
-          sets: '2',
-          reps: '12-15',
-          rest: '60 s',
-          techniqueNote:
-              'Sube hasta la línea del hombro, sin impulso y con peso moderado.',
-        ),
-        WorkoutExercise(
-          name: 'Plancha abdominal',
-          sets: '2',
-          reps: '20-30 s',
-          rest: '60 s',
-          techniqueNote:
-              'Aprieta abdomen y glúteos. No hundas la zona lumbar.',
-        ),
-      ];
-
   @override
   void dispose() {
     _painNoteController.dispose();
@@ -1675,11 +1830,10 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   }
 
   void _completeWorkout() {
-    if (!_logFormKey.currentState!.validate()) {
-      return;
-    }
+    if (!_logFormKey.currentState!.validate()) return;
 
     final log = WorkoutLogData(
+      workoutName: widget.workout.name,
       feeling: _feeling,
       difficulty: _difficulty.round(),
       hasPain: _hasPain,
@@ -1715,7 +1869,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Entrenamiento de hoy'),
+        title: Text(widget.workout.name),
       ),
       body: SafeArea(
         child: Center(
@@ -1726,9 +1880,9 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(24),
                 children: [
-                  const Text(
-                    'Full body estratégico',
-                    style: TextStyle(
+                  Text(
+                    widget.workout.name,
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.8,
@@ -1736,7 +1890,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Fase: Adaptación inteligente. Hoy no buscamos machacarte: buscamos técnica, constancia y una base sólida.',
+                    widget.workout.focus,
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.45,
@@ -1747,6 +1901,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                   _WorkoutSummaryCard(
                     goal: widget.data.currentGoal,
                     schedule: hasNightShiftText,
+                    workoutName: widget.workout.subtitle,
                   ),
                   const SizedBox(height: 22),
                   const _SectionTitle(
@@ -1754,7 +1909,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                     title: 'Ejercicios',
                   ),
                   const SizedBox(height: 12),
-                  ...exercises.asMap().entries.map(
+                  ...widget.workout.exercises.asMap().entries.map(
                         (entry) => _ExerciseCard(
                           number: entry.key + 1,
                           exercise: entry.value,
@@ -1796,26 +1951,11 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                       labelText: 'Sensación general',
                     ),
                     items: const [
-                      DropdownMenuItem(
-                        value: 'Muy mal',
-                        child: Text('Muy mal'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Cansado',
-                        child: Text('Cansado'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Normal',
-                        child: Text('Normal'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Bien',
-                        child: Text('Bien'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'Muy bien',
-                        child: Text('Muy bien'),
-                      ),
+                      DropdownMenuItem(value: 'Muy mal', child: Text('Muy mal')),
+                      DropdownMenuItem(value: 'Cansado', child: Text('Cansado')),
+                      DropdownMenuItem(value: 'Normal', child: Text('Normal')),
+                      DropdownMenuItem(value: 'Bien', child: Text('Bien')),
+                      DropdownMenuItem(value: 'Muy bien', child: Text('Muy bien')),
                     ],
                     onChanged: (value) {
                       if (value == null) return;
@@ -1912,7 +2052,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                   const SizedBox(height: 14),
                   OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Volver al panel'),
+                    child: const Text('Volver'),
                   ),
                 ],
               ),
@@ -1991,6 +2131,7 @@ class WorkoutCompletedScreen extends StatelessWidget {
                   icon: Icons.edit_note_outlined,
                   title: 'Resumen registrado',
                   lines: [
+                    'Entrenamiento: ${log.workoutName}',
                     'Sensación general: ${log.feeling}',
                     'Dificultad percibida: ${log.difficulty}/10',
                     log.cardioCompleted
@@ -2043,12 +2184,16 @@ class WorkoutCompletedScreen extends StatelessWidget {
 class _WeeklyPlanDayCard extends StatelessWidget {
   const _WeeklyPlanDayCard({
     required this.day,
+    this.onTap,
   });
 
   final WeeklyPlanDay day;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final isWorkout = day.workoutTemplate != null;
+
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
       color: const Color(0xFF121821),
@@ -2056,56 +2201,74 @@ class _WeeklyPlanDayCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: isWorkout
+              ? const Color(0xFF00E0A4).withValues(alpha: 0.20)
+              : Colors.white.withValues(alpha: 0.08),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CircleAvatar(
-              backgroundColor:
-                  const Color(0xFF00E0A4).withValues(alpha: 0.16),
-              foregroundColor: const Color(0xFF00E0A4),
-              child: Icon(day.icon, size: 20),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${day.day} · ${day.type}',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.white.withValues(alpha: 0.55),
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    day.title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    day.description,
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      height: 1.38,
-                      color: Colors.white.withValues(alpha: 0.72),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  _SmallChip(label: day.focus),
-                ],
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CircleAvatar(
+                backgroundColor:
+                    const Color(0xFF00E0A4).withValues(alpha: 0.16),
+                foregroundColor: const Color(0xFF00E0A4),
+                child: Icon(day.icon, size: 20),
               ),
-            ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${day.day} · ${day.type}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.white.withValues(alpha: 0.55),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      day.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      day.description,
+                      style: TextStyle(
+                        fontSize: 14.5,
+                        height: 1.38,
+                        color: Colors.white.withValues(alpha: 0.72),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        _SmallChip(label: day.focus),
+                        if (isWorkout) const _SmallChip(label: 'Tocar para abrir'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              if (isWorkout)
+                const Icon(
+                  Icons.chevron_right,
+                  color: Color(0xFF00E0A4),
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -2251,10 +2414,12 @@ class _WorkoutSummaryCard extends StatelessWidget {
   const _WorkoutSummaryCard({
     required this.goal,
     required this.schedule,
+    required this.workoutName,
   });
 
   final String goal;
   final String schedule;
+  final String workoutName;
 
   @override
   Widget build(BuildContext context) {
@@ -2283,10 +2448,10 @@ class _WorkoutSummaryCard extends StatelessWidget {
               label: 'Horario',
               value: schedule,
             ),
-            const _SummaryPill(
-              icon: Icons.timer_outlined,
-              label: 'Duración',
-              value: '60-75 min',
+            _SummaryPill(
+              icon: Icons.assignment_outlined,
+              label: 'Sesión',
+              value: workoutName,
             ),
             const _SummaryPill(
               icon: Icons.speed_outlined,
