@@ -70,6 +70,22 @@ class UserAssessmentData {
   final bool hasNightShift;
 }
 
+class WorkoutExercise {
+  const WorkoutExercise({
+    required this.name,
+    required this.sets,
+    required this.reps,
+    required this.rest,
+    required this.techniqueNote,
+  });
+
+  final String name;
+  final String sets;
+  final String reps;
+  final String rest;
+  final String techniqueNote;
+}
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -138,7 +154,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.4 — Dashboard inicial',
+                    'MVP v0.1.5 — Entrenamiento de hoy',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -618,6 +634,14 @@ class DashboardScreen extends StatelessWidget {
 
   final UserAssessmentData data;
 
+  void _goToWorkoutToday(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WorkoutTodayScreen(data: data),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final trainingDays =
@@ -684,7 +708,7 @@ class DashboardScreen extends StatelessWidget {
                 const _ActionTile(
                   icon: Icons.fitness_center_outlined,
                   title: 'Ver entrenamiento de hoy',
-                  subtitle: 'Próxima versión: pantalla de sesión diaria.',
+                  subtitle: 'Pantalla de sesión diaria disponible.',
                 ),
                 const _ActionTile(
                   icon: Icons.restaurant_outlined,
@@ -730,15 +754,7 @@ class DashboardScreen extends StatelessWidget {
                 SizedBox(
                   height: 56,
                   child: FilledButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Siguiente versión: entrenamiento de hoy',
-                          ),
-                        ),
-                      );
-                    },
+                    onPressed: () => _goToWorkoutToday(context),
                     child: const Text(
                       'Continuar con mi plan',
                       style: TextStyle(
@@ -764,6 +780,357 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class WorkoutTodayScreen extends StatelessWidget {
+  const WorkoutTodayScreen({
+    super.key,
+    required this.data,
+  });
+
+  final UserAssessmentData data;
+
+  List<WorkoutExercise> get exercises => const [
+        WorkoutExercise(
+          name: 'Prensa de piernas',
+          sets: '3',
+          reps: '10-12',
+          rest: '90 s',
+          techniqueNote:
+              'Baja controlado, no bloquees las rodillas y mantén la espalda pegada al respaldo.',
+        ),
+        WorkoutExercise(
+          name: 'Jalón al pecho',
+          sets: '3',
+          reps: '10-12',
+          rest: '90 s',
+          techniqueNote:
+              'Lleva la barra hacia la parte alta del pecho, sin balancearte y juntando escápulas.',
+        ),
+        WorkoutExercise(
+          name: 'Press de pecho en máquina',
+          sets: '3',
+          reps: '10-12',
+          rest: '90 s',
+          techniqueNote:
+              'Empuja fuerte, controla la bajada y evita que los hombros se vayan hacia delante.',
+        ),
+        WorkoutExercise(
+          name: 'Remo sentado en polea',
+          sets: '2',
+          reps: '12',
+          rest: '75 s',
+          techniqueNote:
+              'Tira con la espalda, no con el cuello. Pecho alto y movimiento limpio.',
+        ),
+        WorkoutExercise(
+          name: 'Elevaciones laterales',
+          sets: '2',
+          reps: '12-15',
+          rest: '60 s',
+          techniqueNote:
+              'Sube hasta la línea del hombro, sin impulso y con peso moderado.',
+        ),
+        WorkoutExercise(
+          name: 'Plancha abdominal',
+          sets: '2',
+          reps: '20-30 s',
+          rest: '60 s',
+          techniqueNote:
+              'Aprieta abdomen y glúteos. No hundas la zona lumbar.',
+        ),
+      ];
+
+  void _completeWorkout(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Entrenamiento marcado como completado. Próxima versión: guardar progreso real.',
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasNightShiftText =
+        data.hasNightShift ? 'Post-turno nocturno' : 'Horario estándar';
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Entrenamiento de hoy'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 840),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const Text(
+                  'Full body estratégico',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Fase: Adaptación inteligente. Hoy no buscamos machacarte: buscamos técnica, constancia y una base sólida.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.45,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                _WorkoutSummaryCard(
+                  goal: data.currentGoal,
+                  schedule: hasNightShiftText,
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle(
+                  icon: Icons.fitness_center_outlined,
+                  title: 'Ejercicios',
+                ),
+                const SizedBox(height: 12),
+                ...exercises.asMap().entries.map(
+                      (entry) => _ExerciseCard(
+                        number: entry.key + 1,
+                        exercise: entry.value,
+                      ),
+                    ),
+                const SizedBox(height: 18),
+                const _DashboardCard(
+                  icon: Icons.directions_walk_outlined,
+                  title: 'Cardio suave',
+                  description:
+                      'Después de la fuerza: caminar 15-20 minutos a ritmo cómodo. La prioridad es crear hábito sin reventarte.',
+                  chips: [
+                    '15-20 min',
+                    'Ritmo cómodo',
+                    'Sin impacto',
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const _DashboardCard(
+                  icon: Icons.warning_amber_outlined,
+                  title: 'Regla de seguridad',
+                  description:
+                      'Si aparece dolor articular raro, mareo, pinchazo fuerte o molestia que cambia tu técnica, paras el ejercicio y lo registramos para adaptarlo.',
+                  chips: [
+                    'Sin ego',
+                    'Técnica primero',
+                    'Progresión gradual',
+                  ],
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: () => _completeWorkout(context),
+                    child: const Text(
+                      'Marcar entrenamiento como completado',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Volver al panel'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkoutSummaryCard extends StatelessWidget {
+  const _WorkoutSummaryCard({
+    required this.goal,
+    required this.schedule,
+  });
+
+  final String goal;
+  final String schedule;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF101F1B),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(
+          color: const Color(0xFF00E0A4).withValues(alpha: 0.28),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            _SummaryPill(
+              icon: Icons.flag_outlined,
+              label: 'Objetivo',
+              value: goal,
+            ),
+            _SummaryPill(
+              icon: Icons.schedule_outlined,
+              label: 'Horario',
+              value: schedule,
+            ),
+            const _SummaryPill(
+              icon: Icons.timer_outlined,
+              label: 'Duración',
+              value: '60-75 min',
+            ),
+            const _SummaryPill(
+              icon: Icons.speed_outlined,
+              label: 'Intensidad',
+              value: 'Moderada',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ExerciseCard extends StatelessWidget {
+  const _ExerciseCard({
+    required this.number,
+    required this.exercise,
+  });
+
+  final int number;
+  final WorkoutExercise exercise;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      color: const Color(0xFF121821),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundColor:
+                  const Color(0xFF00E0A4).withValues(alpha: 0.16),
+              foregroundColor: const Color(0xFF00E0A4),
+              child: Text(
+                '$number',
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    exercise.name,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _SmallChip(label: '${exercise.sets} series'),
+                      _SmallChip(label: '${exercise.reps} reps'),
+                      _SmallChip(label: 'Descanso ${exercise.rest}'),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    exercise.techniqueNote,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.38,
+                      color: Colors.white.withValues(alpha: 0.70),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SummaryPill extends StatelessWidget {
+  const _SummaryPill({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  final IconData icon;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 175,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            color: const Color(0xFF00E0A4),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    color: Colors.white.withValues(alpha: 0.55),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1094,6 +1461,25 @@ class _MetricBox extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SmallChip extends StatelessWidget {
+  const _SmallChip({
+    required this.label,
+  });
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(label),
+      backgroundColor: const Color(0xFF00E0A4).withValues(alpha: 0.10),
+      side: BorderSide(
+        color: const Color(0xFF00E0A4).withValues(alpha: 0.16),
       ),
     );
   }
