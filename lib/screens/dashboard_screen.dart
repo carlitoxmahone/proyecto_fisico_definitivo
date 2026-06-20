@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../data/app_workout_templates.dart';
+import '../models/saved_habits_summary.dart';
+import '../models/saved_workout_summary.dart';
 import '../models/user_assessment_data.dart';
+import '../services/local_storage_service.dart';
 import '../widgets/action_tile.dart';
 import '../widgets/dashboard_card.dart';
 import '../widgets/main_status_card.dart';
@@ -56,6 +59,56 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildSavedSummaries(
+    SavedWorkoutSummary? lastWorkout,
+    SavedHabitsSummary? lastHabits,
+  ) {
+    if (lastWorkout == null && lastHabits == null) {
+      return const SizedBox.shrink();
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 18),
+        const SectionTitle(
+          icon: Icons.save_outlined,
+          title: 'Últimos registros',
+        ),
+        const SizedBox(height: 12),
+        if (lastWorkout != null) ...[
+          DashboardCard(
+            icon: Icons.fitness_center_outlined,
+            title: 'Último entrenamiento registrado',
+            description:
+                '${lastWorkout.workoutName} · ${lastWorkout.savedAtText}',
+            chips: [
+              'Sensación: ${lastWorkout.feeling}',
+              'Dificultad ${lastWorkout.difficulty}/10',
+              lastWorkout.cardioCompleted ? 'Cardio sí' : 'Cardio no',
+              'Cambios: ${lastWorkout.replacedExercisesCount}',
+              'Rendimiento: ${lastWorkout.registeredPerformanceCount}',
+              lastWorkout.hasPain ? 'Con molestia' : 'Sin molestia',
+            ],
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (lastHabits != null)
+          DashboardCard(
+            icon: Icons.water_drop_outlined,
+            title: 'Último registro de hábitos',
+            description: 'Guardado: ${lastHabits.savedAtText}',
+            chips: [
+              '${lastHabits.waterGlasses} vasos',
+              '${lastHabits.steps} pasos',
+              'Energía ${lastHabits.energy}/10',
+              'Snacks ${lastHabits.snackAnxiety}/10',
+            ],
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final trainingDays =
@@ -95,6 +148,19 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 MainStatusCard(data: data),
+                FutureBuilder<List<Object?>>(
+                  future: Future.wait<Object?>([
+                    LocalStorageService.getLastWorkout(),
+                    LocalStorageService.getLastHabits(),
+                  ]),
+                  builder: (context, snapshot) {
+                    final values = snapshot.data;
+                    return _buildSavedSummaries(
+                      values?[0] as SavedWorkoutSummary?,
+                      values?[1] as SavedHabitsSummary?,
+                    );
+                  },
+                ),
                 const SizedBox(height: 18),
                 const SectionTitle(
                   icon: Icons.route_outlined,
@@ -198,4 +264,3 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 }
-

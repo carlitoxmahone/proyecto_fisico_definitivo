@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/habits_log_data.dart';
+import '../models/saved_habits_summary.dart';
 import '../models/user_assessment_data.dart';
+import '../services/local_storage_service.dart';
 import '../widgets/info_text.dart';
 import '../widgets/section_title.dart';
 import '../widgets/slider_card.dart';
@@ -81,7 +83,7 @@ class _HabitsScreenState extends State<HabitsScreen> {
     return 'Buen control del picoteo. Mantén la estructura.';
   }
 
-  void _saveHabits() {
+  Future<void> _saveHabits() async {
     final log = HabitsLogData(
       waterGlasses: _waterGlasses.round(),
       steps: _steps.round(),
@@ -89,6 +91,18 @@ class _HabitsScreenState extends State<HabitsScreen> {
       snackAnxiety: _snackAnxiety.round(),
       note: _noteController.text.trim(),
     );
+
+    await LocalStorageService.saveLastHabits(
+      SavedHabitsSummary(
+        waterGlasses: log.waterGlasses,
+        steps: log.steps,
+        energy: log.energy,
+        snackAnxiety: log.snackAnxiety,
+        savedAtText: DateTime.now().toLocal().toString(),
+      ),
+    );
+
+    if (!mounted) return;
 
     Navigator.of(context).push(
       MaterialPageRoute(

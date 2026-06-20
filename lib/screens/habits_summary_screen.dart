@@ -60,7 +60,7 @@ class HabitsSummaryScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'De momento se guarda solo en memoria. Más adelante lo guardaremos de forma persistente.',
+                  'Este registro queda guardado en este dispositivo para consultarlo desde el panel principal.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.45,

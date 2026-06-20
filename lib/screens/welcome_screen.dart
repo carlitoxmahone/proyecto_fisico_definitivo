@@ -69,7 +69,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.2.4 — Resumen de rendimiento · Sustitución de ejercicios',
+                    'MVP v0.2.5 — Persistencia local básica',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

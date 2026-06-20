@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../models/exercise_performance_log.dart';
 import '../models/exercise_set_log.dart';
+import '../models/saved_workout_summary.dart';
 import '../models/user_assessment_data.dart';
 import '../models/workout_exercise.dart';
 import '../models/workout_log_data.dart';
 import '../models/workout_template.dart';
+import '../services/local_storage_service.dart';
 import '../widgets/dashboard_card.dart';
 import '../widgets/exercise_card.dart';
 import '../widgets/section_title.dart';
@@ -107,7 +109,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
     }).toList();
   }
 
-  void _completeWorkout() {
+  Future<void> _completeWorkout() async {
     if (!_logFormKey.currentState!.validate()) return;
 
     final log = WorkoutLogData(
@@ -121,6 +123,21 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
       replacedExercisesCount: replacedExercisesCount,
       performanceLogs: performanceLogs,
     );
+
+    await LocalStorageService.saveLastWorkout(
+      SavedWorkoutSummary(
+        workoutName: log.workoutName,
+        feeling: log.feeling,
+        difficulty: log.difficulty,
+        cardioCompleted: log.cardioCompleted,
+        replacedExercisesCount: log.replacedExercisesCount,
+        registeredPerformanceCount: log.registeredPerformanceCount,
+        hasPain: log.hasPain,
+        savedAtText: DateTime.now().toLocal().toString(),
+      ),
+    );
+
+    if (!mounted) return;
 
     Navigator.of(context).push(
       MaterialPageRoute(
