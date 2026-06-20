@@ -138,7 +138,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.3 — Formulario básico',
+                    'MVP v0.1.4 — Dashboard inicial',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -270,7 +270,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     ),
                   ),
                   const SizedBox(height: 28),
-                  _SectionTitle(
+                  const _SectionTitle(
                     icon: Icons.person_outline,
                     title: 'Perfil físico',
                   ),
@@ -345,7 +345,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     ],
                   ),
                   const SizedBox(height: 28),
-                  _SectionTitle(
+                  const _SectionTitle(
                     icon: Icons.flag_outlined,
                     title: 'Objetivo',
                   ),
@@ -416,7 +416,7 @@ class _AssessmentScreenState extends State<AssessmentScreen> {
                     },
                   ),
                   const SizedBox(height: 28),
-                  _SectionTitle(
+                  const _SectionTitle(
                     icon: Icons.fitness_center_outlined,
                     title: 'Entrenamiento y horario',
                   ),
@@ -486,6 +486,15 @@ class DiagnosisScreen extends StatelessWidget {
   });
 
   final UserAssessmentData data;
+
+  void _goToDashboard(BuildContext context) {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => DashboardScreen(data: data),
+      ),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -577,15 +586,7 @@ class DiagnosisScreen extends StatelessWidget {
                 SizedBox(
                   height: 56,
                   child: FilledButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Siguiente versión: Dashboard inicial',
-                          ),
-                        ),
-                      );
-                    },
+                    onPressed: () => _goToDashboard(context),
                     child: const Text(
                       'Crear mi primer plan',
                       style: TextStyle(
@@ -603,6 +604,217 @@ class DiagnosisScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class DashboardScreen extends StatelessWidget {
+  const DashboardScreen({
+    super.key,
+    required this.data,
+  });
+
+  final UserAssessmentData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final trainingDays =
+        int.tryParse(data.trainingDays.replaceAll(',', '.')) ?? 0;
+
+    final recommendedStrengthDays = trainingDays >= 4 ? 3 : trainingDays;
+    final optionalDay = trainingDays >= 4;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Panel principal'),
+        automaticallyImplyLeading: false,
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 820),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                Text(
+                  'Hola, ${data.name}',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Tu plan inicial ya está preparado. Esta es la primera versión del panel principal.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.45,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _MainStatusCard(data: data),
+                const SizedBox(height: 18),
+                const _SectionTitle(
+                  icon: Icons.route_outlined,
+                  title: 'Fase actual',
+                ),
+                const SizedBox(height: 12),
+                _DashboardCard(
+                  icon: Icons.rocket_launch_outlined,
+                  title: 'Adaptación inteligente — 4 semanas',
+                  description:
+                      'No empezamos con 5 días duros. Primero construimos adherencia, técnica, fuerza base y tolerancia al cardio.',
+                  chips: [
+                    '$recommendedStrengthDays días fuerza',
+                    if (optionalDay) '1 día opcional',
+                    'Cardio suave',
+                    'Pasos progresivos',
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const _SectionTitle(
+                  icon: Icons.today_outlined,
+                  title: 'Acciones de hoy',
+                ),
+                const SizedBox(height: 12),
+                const _ActionTile(
+                  icon: Icons.fitness_center_outlined,
+                  title: 'Ver entrenamiento de hoy',
+                  subtitle: 'Próxima versión: pantalla de sesión diaria.',
+                ),
+                const _ActionTile(
+                  icon: Icons.restaurant_outlined,
+                  title: 'Ver comidas recomendadas',
+                  subtitle: 'Próxima versión: nutrición por horario nocturno.',
+                ),
+                const _ActionTile(
+                  icon: Icons.water_drop_outlined,
+                  title: 'Registrar agua y pasos',
+                  subtitle: 'Próxima versión: hábitos diarios básicos.',
+                ),
+                const SizedBox(height: 18),
+                const _SectionTitle(
+                  icon: Icons.insights_outlined,
+                  title: 'Métricas iniciales',
+                ),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _MetricBox(
+                      label: 'Peso',
+                      value: '${data.weightKg} kg',
+                    ),
+                    _MetricBox(
+                      label: 'Cintura',
+                      value: '${data.waistCm} cm',
+                    ),
+                    _MetricBox(
+                      label: 'Objetivo',
+                      value: data.currentGoal,
+                    ),
+                    _MetricBox(
+                      label: 'Horario',
+                      value: data.hasNightShift
+                          ? 'Turno nocturno'
+                          : 'Horario estándar',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Siguiente versión: entrenamiento de hoy',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Continuar con mi plan',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (_) => const WelcomeScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: const Text('Volver al inicio'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MainStatusCard extends StatelessWidget {
+  const _MainStatusCard({
+    required this.data,
+  });
+
+  final UserAssessmentData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF101F1B),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(
+          color: const Color(0xFF00E0A4).withValues(alpha: 0.28),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Icon(
+              Icons.check_circle_outline,
+              color: Color(0xFF00E0A4),
+              size: 38,
+            ),
+            const SizedBox(height: 14),
+            const Text(
+              'Plan inicial creado',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Objetivo: ${data.currentGoal}. Enfoque visual: ${data.visualGoal}.',
+              style: TextStyle(
+                fontSize: 16,
+                height: 1.4,
+                color: Colors.white.withValues(alpha: 0.76),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -702,6 +914,185 @@ class _DiagnosisCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DashboardCard extends StatelessWidget {
+  const _DashboardCard({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.chips,
+  });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final List<String> chips;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF121821),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              icon,
+              color: const Color(0xFF00E0A4),
+              size: 32,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 15,
+                height: 1.4,
+                color: Colors.white.withValues(alpha: 0.72),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: chips
+                  .map(
+                    (chip) => Chip(
+                      label: Text(chip),
+                      backgroundColor:
+                          const Color(0xFF00E0A4).withValues(alpha: 0.12),
+                      side: BorderSide(
+                        color: const Color(0xFF00E0A4)
+                            .withValues(alpha: 0.18),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionTile extends StatelessWidget {
+  const _ActionTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      color: const Color(0xFF121821),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: ListTile(
+        leading: Icon(
+          icon,
+          color: const Color(0xFF00E0A4),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.62),
+          ),
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(subtitle),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _MetricBox extends StatelessWidget {
+  const _MetricBox({
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 170,
+      child: Card(
+        color: const Color(0xFF121821),
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(
+            color: Colors.white.withValues(alpha: 0.08),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Colors.white.withValues(alpha: 0.55),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                value,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
