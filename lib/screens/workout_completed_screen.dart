@@ -15,24 +15,64 @@ class WorkoutCompletedScreen extends StatelessWidget {
   final UserAssessmentData data;
   final WorkoutLogData log;
 
-  String get recommendation {
-    if (log.hasPain) {
-      return 'Próxima recomendación: revisar el ejercicio donde hubo molestia y preparar una alternativa segura.';
-    }
+  List<String> get adaptiveRecommendations {
+    final recommendations = <String>[];
 
-    if (log.replacedExercisesCount >= 2) {
-      return 'Próxima recomendación: revisar si el gimnasio tenía máquinas ocupadas o si la sesión necesita alternativas más directas.';
+    if (log.hasPain) {
+      recommendations.add(
+        'Prioridad máxima: revisar la molestia y preparar una alternativa segura.',
+      );
+
+      if (log.replacedExercisesCount > 0) {
+        recommendations.add(
+          'También conviene revisar si el cambio fue por molestia o por disponibilidad.',
+        );
+      }
     }
 
     if (log.difficulty >= 8) {
-      return 'Próxima recomendación: mantener el mismo nivel. No subimos carga todavía porque la sesión fue dura.';
+      recommendations.add(
+        'Mantener cargas y no subir exigencia todavía: la sesión ya fue alta.',
+      );
     }
 
     if (log.difficulty <= 4 && log.feeling == 'Muy bien') {
-      return 'Próxima recomendación: podríamos subir ligeramente la exigencia si se repite esta sensación.';
+      recommendations.add(
+        'Posible progresión futura si se repite esta sensación con buena técnica.',
+      );
     }
 
-    return 'Próxima recomendación: repetir estructura y buscar constancia antes de aumentar volumen.';
+    if (log.registeredPerformanceCount == 0) {
+      recommendations.add(
+        'Sin kilos o repeticiones registradas la app no podrá progresar bien.',
+      );
+    } else if (log.registeredPerformanceCount <= 2) {
+      recommendations.add(
+        'El registro va bien, pero conviene anotar más ejercicios para decidir mejor.',
+      );
+    } else {
+      recommendations.add(
+        'Hay buena base de rendimiento para futuras decisiones de progresión.',
+      );
+    }
+
+    if (log.cardioCompleted) {
+      recommendations.add(
+        'El cardio suave suma puntos positivos de adherencia.',
+      );
+    } else {
+      recommendations.add(
+        'El cardio suave queda pendiente como hábito de base.',
+      );
+    }
+
+    if (recommendations.isEmpty) {
+      recommendations.add(
+        'Repetir estructura y buscar constancia antes de aumentar volumen.',
+      );
+    }
+
+    return recommendations;
   }
 
   @override
@@ -92,9 +132,9 @@ class WorkoutCompletedScreen extends StatelessWidget {
                 ),
                 DiagnosisCard(
                   icon: Icons.psychology_alt_outlined,
-                  title: 'Primera decisión adaptativa',
+                  title: 'Decisión adaptativa',
                   lines: [
-                    recommendation,
+                    ...adaptiveRecommendations,
                     'En próximas versiones este resultado modificará automáticamente el plan.',
                   ],
                 ),
