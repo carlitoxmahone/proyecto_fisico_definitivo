@@ -104,6 +104,20 @@ class WorkoutLogData {
   final String freeNote;
 }
 
+class NutritionMeal {
+  const NutritionMeal({
+    required this.time,
+    required this.title,
+    required this.description,
+    required this.goal,
+  });
+
+  final String time;
+  final String title;
+  final String description;
+  final String goal;
+}
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -172,7 +186,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.6 — Registro básico del entrenamiento',
+                    'MVP v0.1.7 — Nutrición por turno nocturno',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -660,6 +674,14 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  void _goToNutrition(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => NutritionScreen(data: data),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final trainingDays =
@@ -723,15 +745,17 @@ class DashboardScreen extends StatelessWidget {
                   title: 'Acciones de hoy',
                 ),
                 const SizedBox(height: 12),
-                const _ActionTile(
+                _ActionTile(
                   icon: Icons.fitness_center_outlined,
                   title: 'Ver entrenamiento de hoy',
                   subtitle: 'Pantalla de sesión diaria disponible.',
+                  onTap: () => _goToWorkoutToday(context),
                 ),
-                const _ActionTile(
+                _ActionTile(
                   icon: Icons.restaurant_outlined,
                   title: 'Ver comidas recomendadas',
-                  subtitle: 'Próxima versión: nutrición por horario nocturno.',
+                  subtitle: 'Nutrición adaptada a tu horario nocturno.',
+                  onTap: () => _goToNutrition(context),
                 ),
                 const _ActionTile(
                   icon: Icons.water_drop_outlined,
@@ -793,6 +817,215 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                   child: const Text('Volver al inicio'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NutritionScreen extends StatefulWidget {
+  const NutritionScreen({
+    super.key,
+    required this.data,
+  });
+
+  final UserAssessmentData data;
+
+  @override
+  State<NutritionScreen> createState() => _NutritionScreenState();
+}
+
+class _NutritionScreenState extends State<NutritionScreen> {
+  bool _trainingDay = true;
+
+  List<NutritionMeal> get trainingMeals => const [
+        NutritionMeal(
+          time: '16:15',
+          title: 'Comida al despertar',
+          description:
+              'Proteína alta + carbohidrato controlado + verdura. Ejemplo: pollo, arroz/patata y verdura.',
+          goal: 'Activar el día sin llegar pesado al turno.',
+        ),
+        NutritionMeal(
+          time: '20:30',
+          title: 'Comida pre-trabajo',
+          description:
+              'Comida completa y saciante. Ejemplo: huevos, legumbres o carne magra con verduras.',
+          goal: 'Llegar al turno con energía estable.',
+        ),
+        NutritionMeal(
+          time: '02:00',
+          title: 'Comida del descanso',
+          description:
+              'Proteína fácil + carbohidrato moderado. Ejemplo: yogur proteico, bocadillo controlado o táper simple.',
+          goal: 'Evitar picoteo y bajón de madrugada.',
+        ),
+        NutritionMeal(
+          time: '06:00',
+          title: 'Pre-entreno ligero',
+          description:
+              'Algo digestivo. Ejemplo: yogur proteico, fruta o café si lo toleras.',
+          goal: 'Entrenar sin pesadez después del turno.',
+        ),
+        NutritionMeal(
+          time: '08:15',
+          title: 'Post-entreno / pre-sueño',
+          description:
+              'Proteína alta y comida fácil de digerir. Ejemplo: tortilla, queso fresco, yogur proteico o pollo.',
+          goal: 'Recuperar sin fastidiar el sueño.',
+        ),
+      ];
+
+  List<NutritionMeal> get restMeals => const [
+        NutritionMeal(
+          time: '16:15',
+          title: 'Comida al despertar',
+          description:
+              'Proteína alta + verdura + carbohidrato moderado. Sin hacer una comida pobre.',
+          goal: 'Mantener energía y adherencia.',
+        ),
+        NutritionMeal(
+          time: '20:30',
+          title: 'Comida pre-trabajo',
+          description:
+              'Comida saciante con proteína. Ejemplo: pollo, huevos, legumbres o carne magra.',
+          goal: 'Reducir hambre durante el turno.',
+        ),
+        NutritionMeal(
+          time: '02:00',
+          title: 'Comida del descanso',
+          description:
+              'Comida controlada y preparada. Evitar improvisar snacks o bollería.',
+          goal: 'Controlar la madrugada.',
+        ),
+        NutritionMeal(
+          time: '06:30',
+          title: 'Cierre del día',
+          description:
+              'Comida ligera si hay hambre real. Prioridad: proteína y digestión fácil.',
+          goal: 'Dormir mejor y no irte a la cama pesado.',
+        ),
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final meals = _trainingDay ? trainingMeals : restMeals;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Nutrición de hoy'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 840),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const Text(
+                  'Nutrición adaptada a tu horario',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.data.hasNightShift
+                      ? 'Modo turno nocturno activado. Organizamos las comidas alrededor de tu sueño, trabajo y entrenamiento.'
+                      : 'Modo horario estándar. Más adelante ajustaremos horas personalizadas.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.45,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                _NutritionModeCard(
+                  trainingDay: _trainingDay,
+                  onChanged: (value) {
+                    setState(() => _trainingDay = value);
+                  },
+                ),
+                const SizedBox(height: 22),
+                const _SectionTitle(
+                  icon: Icons.restaurant_outlined,
+                  title: 'Comidas recomendadas',
+                ),
+                const SizedBox(height: 12),
+                ...meals.asMap().entries.map(
+                      (entry) => _NutritionMealCard(
+                        number: entry.key + 1,
+                        meal: entry.value,
+                      ),
+                    ),
+                const SizedBox(height: 18),
+                const _DashboardCard(
+                  icon: Icons.water_drop_outlined,
+                  title: 'Objetivo de agua',
+                  description:
+                      'Primer objetivo: subir de forma realista. Empieza con 6 vasos al día y después lo llevaremos hacia 2-2,5 litros si lo toleras bien.',
+                  chips: [
+                    '6 vasos iniciales',
+                    'Progresivo',
+                    'Sin forzar',
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const _DashboardCard(
+                  icon: Icons.no_food_outlined,
+                  title: 'Regla anti-snacks',
+                  description:
+                      'No se prohíbe todo. La regla inicial es no improvisar de madrugada: si hay hambre, se usa una opción prevista, no bollería ni picoteo automático.',
+                  chips: [
+                    'Planificar',
+                    'No improvisar',
+                    'Alta proteína',
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const _DashboardCard(
+                  icon: Icons.shopping_basket_outlined,
+                  title: 'Base Mercadona',
+                  description:
+                      'Más adelante añadiremos productos concretos de Mercadona con gramos, calorías y macros. En esta versión solo fijamos estructura y horarios.',
+                  chips: [
+                    'Mercadona',
+                    'Gramos después',
+                    'Macros después',
+                  ],
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Siguiente versión: registrar agua y pasos',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Entendido',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Volver al panel'),
                 ),
               ],
             ),
@@ -1241,6 +1474,141 @@ class WorkoutCompletedScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NutritionModeCard extends StatelessWidget {
+  const _NutritionModeCard({
+    required this.trainingDay,
+    required this.onChanged,
+  });
+
+  final bool trainingDay;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF101F1B),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+        side: BorderSide(
+          color: const Color(0xFF00E0A4).withValues(alpha: 0.28),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Tipo de día',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 12),
+            SegmentedButton<bool>(
+              segments: const [
+                ButtonSegment(
+                  value: true,
+                  label: Text('Entreno'),
+                  icon: Icon(Icons.fitness_center_outlined),
+                ),
+                ButtonSegment(
+                  value: false,
+                  label: Text('Descanso'),
+                  icon: Icon(Icons.bedtime_outlined),
+                ),
+              ],
+              selected: {trainingDay},
+              onSelectionChanged: (selection) {
+                onChanged(selection.first);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NutritionMealCard extends StatelessWidget {
+  const _NutritionMealCard({
+    required this.number,
+    required this.meal,
+  });
+
+  final int number;
+  final NutritionMeal meal;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      color: const Color(0xFF121821),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundColor:
+                  const Color(0xFF00E0A4).withValues(alpha: 0.16),
+              foregroundColor: const Color(0xFF00E0A4),
+              child: Text(
+                '$number',
+                style: const TextStyle(fontWeight: FontWeight.w900),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    meal.time,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white.withValues(alpha: 0.55),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    meal.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    meal.description,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.38,
+                      color: Colors.white.withValues(alpha: 0.72),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _SmallChip(label: meal.goal),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -1710,11 +2078,13 @@ class _ActionTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1744,13 +2114,14 @@ class _ActionTile extends StatelessWidget {
           ),
         ),
         trailing: const Icon(Icons.chevron_right),
-        onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(subtitle),
-            ),
-          );
-        },
+        onTap: onTap ??
+            () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(subtitle),
+                ),
+              );
+            },
       ),
     );
   }
