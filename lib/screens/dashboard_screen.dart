@@ -14,6 +14,7 @@ import 'habits_screen.dart';
 import 'nutrition_screen.dart';
 import 'weekly_plan_screen.dart';
 import 'welcome_screen.dart';
+import 'workout_history_screen.dart';
 import 'workout_today_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -55,6 +56,14 @@ class DashboardScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => WeeklyPlanScreen(data: data),
+      ),
+    );
+  }
+
+  void _goToWorkoutHistory(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const WorkoutHistoryScreen(),
       ),
     );
   }
@@ -208,6 +217,12 @@ class DashboardScreen extends StatelessWidget {
                   title: 'Registrar agua y pasos',
                   subtitle: 'Registro básico de hábitos diarios.',
                   onTap: () => _goToHabits(context),
+                ),
+                ActionTile(
+                  icon: Icons.history,
+                  title: 'Historial de entrenamientos',
+                  subtitle: 'Consulta los últimos entrenamientos guardados.',
+                  onTap: () => _goToWorkoutHistory(context),
                 ),
                 const SizedBox(height: 18),
                 const SectionTitle(

@@ -124,18 +124,19 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
       performanceLogs: performanceLogs,
     );
 
-    await LocalStorageService.saveLastWorkout(
-      SavedWorkoutSummary(
-        workoutName: log.workoutName,
-        feeling: log.feeling,
-        difficulty: log.difficulty,
-        cardioCompleted: log.cardioCompleted,
-        replacedExercisesCount: log.replacedExercisesCount,
-        registeredPerformanceCount: log.registeredPerformanceCount,
-        hasPain: log.hasPain,
-        savedAtText: DateTime.now().toLocal().toString(),
-      ),
+    final summary = SavedWorkoutSummary(
+      workoutName: log.workoutName,
+      feeling: log.feeling,
+      difficulty: log.difficulty,
+      cardioCompleted: log.cardioCompleted,
+      replacedExercisesCount: log.replacedExercisesCount,
+      registeredPerformanceCount: log.registeredPerformanceCount,
+      hasPain: log.hasPain,
+      savedAtText: DateTime.now().toLocal().toString(),
     );
+
+    await LocalStorageService.saveLastWorkout(summary);
+    await LocalStorageService.saveWorkoutToHistory(summary);
 
     if (!mounted) return;
 
