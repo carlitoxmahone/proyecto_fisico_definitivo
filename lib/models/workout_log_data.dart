@@ -1,5 +1,7 @@
 
 
+import 'exercise_performance_log.dart';
+
 class WorkoutLogData {
   const WorkoutLogData({
     required this.feeling,
@@ -10,6 +12,7 @@ class WorkoutLogData {
     required this.freeNote,
     required this.workoutName,
     required this.replacedExercisesCount,
+    required this.performanceLogs,
   });
 
   final String feeling;
@@ -20,5 +23,9 @@ class WorkoutLogData {
   final String freeNote;
   final String workoutName;
   final int replacedExercisesCount;
-}
+  final List<ExercisePerformanceLog> performanceLogs;
 
+  int get registeredPerformanceCount {
+    return performanceLogs.where((log) => log.hasData).length;
+  }
+}

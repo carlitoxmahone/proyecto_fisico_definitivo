@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../models/exercise_performance_log.dart';
+import '../models/exercise_set_log.dart';
 import '../models/user_assessment_data.dart';
 import '../models/workout_exercise.dart';
 import '../models/workout_log_data.dart';
@@ -34,6 +36,8 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   bool _cardioCompleted = false;
 
   late List<WorkoutExercise> _currentExercises;
+  late List<List<TextEditingController>> _kgControllers;
+  late List<List<TextEditingController>> _repsControllers;
 
   final _painNoteController = TextEditingController();
   final _freeNoteController = TextEditingController();
@@ -42,10 +46,36 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   void initState() {
     super.initState();
     _currentExercises = List<WorkoutExercise>.from(widget.workout.exercises);
+    _kgControllers = _currentExercises
+        .map(
+          (exercise) => List.generate(
+            _plannedSetCount(exercise),
+            (_) => TextEditingController(),
+          ),
+        )
+        .toList();
+    _repsControllers = _currentExercises
+        .map(
+          (exercise) => List.generate(
+            _plannedSetCount(exercise),
+            (_) => TextEditingController(),
+          ),
+        )
+        .toList();
   }
 
   @override
   void dispose() {
+    for (final controllers in _kgControllers) {
+      for (final controller in controllers) {
+        controller.dispose();
+      }
+    }
+    for (final controllers in _repsControllers) {
+      for (final controller in controllers) {
+        controller.dispose();
+      }
+    }
     _painNoteController.dispose();
     _freeNoteController.dispose();
     super.dispose();
@@ -53,6 +83,28 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
 
   int get replacedExercisesCount {
     return _currentExercises.where((exercise) => exercise.wasReplaced).length;
+  }
+
+  int _plannedSetCount(WorkoutExercise exercise) {
+    return int.tryParse(exercise.sets) ?? 1;
+  }
+
+  List<ExercisePerformanceLog> get performanceLogs {
+    return _currentExercises.asMap().entries.map((entry) {
+      final index = entry.key;
+      final exercise = entry.value;
+
+      return ExercisePerformanceLog(
+        exerciseName: exercise.name,
+        sets: List.generate(
+          _kgControllers[index].length,
+          (setIndex) => ExerciseSetLog(
+            kg: _kgControllers[index][setIndex].text.trim(),
+            reps: _repsControllers[index][setIndex].text.trim(),
+          ),
+        ),
+      );
+    }).toList();
   }
 
   void _completeWorkout() {
@@ -67,6 +119,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
       cardioCompleted: _cardioCompleted,
       freeNote: _freeNoteController.text.trim(),
       replacedExercisesCount: replacedExercisesCount,
+      performanceLogs: performanceLogs,
     );
 
     Navigator.of(context).push(
@@ -243,6 +296,8 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                         (entry) => ExerciseCard(
                           number: entry.key + 1,
                           exercise: entry.value,
+                          kgControllers: _kgControllers[entry.key],
+                          repsControllers: _repsControllers[entry.key],
                           onReplace: () => _replaceExercise(entry.key),
                         ),
                       ),
@@ -409,4 +464,3 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
     );
   }
 }
-

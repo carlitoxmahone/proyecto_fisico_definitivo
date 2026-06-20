@@ -7,11 +7,15 @@ class ExerciseCard extends StatelessWidget {
   const ExerciseCard({
     required this.number,
     required this.exercise,
+    required this.kgControllers,
+    required this.repsControllers,
     required this.onReplace,
   });
 
   final int number;
   final WorkoutExercise exercise;
+  final List<TextEditingController> kgControllers;
+  final List<TextEditingController> repsControllers;
   final VoidCallback onReplace;
 
   @override
@@ -88,6 +92,49 @@ class ExerciseCard extends StatelessWidget {
                       color: Colors.white.withValues(alpha: 0.70),
                     ),
                   ),
+                  const SizedBox(height: 14),
+                  ...List.generate(
+                    kgControllers.length,
+                    (index) => Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 72,
+                            child: Text(
+                              'Serie ${index + 1}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextFormField(
+                              controller: kgControllers[index],
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                decimal: true,
+                              ),
+                              decoration: const InputDecoration(
+                                labelText: 'kg',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextFormField(
+                              controller: repsControllers[index],
+                              keyboardType: TextInputType.number,
+                              decoration: const InputDecoration(
+                                labelText: 'reps',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
                     onPressed: onReplace,
@@ -103,4 +150,3 @@ class ExerciseCard extends StatelessWidget {
     );
   }
 }
-

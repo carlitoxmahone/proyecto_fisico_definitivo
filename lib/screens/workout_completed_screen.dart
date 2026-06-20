@@ -76,10 +76,11 @@ class WorkoutCompletedScreen extends StatelessWidget {
                   icon: Icons.edit_note_outlined,
                   title: 'Resumen registrado',
                   lines: [
-                    'Entrenamiento: ${log.workoutName}',
+                    'Entrenamiento realizado: ${log.workoutName}',
                     'Sensación general: ${log.feeling}',
                     'Dificultad percibida: ${log.difficulty}/10',
                     'Ejercicios cambiados: ${log.replacedExercisesCount}',
+                    'Ejercicios con rendimiento registrado: ${log.registeredPerformanceCount}',
                     log.cardioCompleted
                         ? 'Cardio suave completado.'
                         : 'Cardio suave no completado.',
@@ -126,4 +127,3 @@ class WorkoutCompletedScreen extends StatelessWidget {
     );
   }
 }
-
