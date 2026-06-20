@@ -134,6 +134,24 @@ class HabitsLogData {
   final String note;
 }
 
+class WeeklyPlanDay {
+  const WeeklyPlanDay({
+    required this.day,
+    required this.title,
+    required this.type,
+    required this.description,
+    required this.focus,
+    required this.icon,
+  });
+
+  final String day;
+  final String title;
+  final String type;
+  final String description;
+  final String focus;
+  final IconData icon;
+}
+
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
@@ -202,7 +220,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.8 — Registro de agua y pasos',
+                    'MVP v0.1.9 — Plan semanal básico',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -706,6 +724,14 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  void _goToWeeklyPlan(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => WeeklyPlanScreen(data: data),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final trainingDays =
@@ -770,6 +796,12 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 _ActionTile(
+                  icon: Icons.calendar_month_outlined,
+                  title: 'Ver plan semanal',
+                  subtitle: 'Semana 1 de adaptación inteligente.',
+                  onTap: () => _goToWeeklyPlan(context),
+                ),
+                _ActionTile(
                   icon: Icons.fitness_center_outlined,
                   title: 'Ver entrenamiento de hoy',
                   subtitle: 'Pantalla de sesión diaria disponible.',
@@ -821,9 +853,9 @@ class DashboardScreen extends StatelessWidget {
                 SizedBox(
                   height: 56,
                   child: FilledButton(
-                    onPressed: () => _goToWorkoutToday(context),
+                    onPressed: () => _goToWeeklyPlan(context),
                     child: const Text(
-                      'Continuar con mi plan',
+                      'Ver mi semana de entrenamiento',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
@@ -842,6 +874,180 @@ class DashboardScreen extends StatelessWidget {
                     );
                   },
                   child: const Text('Volver al inicio'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class WeeklyPlanScreen extends StatelessWidget {
+  const WeeklyPlanScreen({
+    super.key,
+    required this.data,
+  });
+
+  final UserAssessmentData data;
+
+  List<WeeklyPlanDay> get weekOne => const [
+        WeeklyPlanDay(
+          day: 'Día 1',
+          title: 'Full body A',
+          type: 'Fuerza',
+          description:
+              'Sesión de cuerpo completo con máquinas y técnica controlada.',
+          focus: 'Aprender movimientos, no buscar máximo peso.',
+          icon: Icons.fitness_center_outlined,
+        ),
+        WeeklyPlanDay(
+          day: 'Día 2',
+          title: 'Cardio suave / pasos',
+          type: 'Cardio',
+          description:
+              'Caminar a ritmo cómodo y subir pasos sin impacto para las rodillas.',
+          focus: 'Crear hábito cardiovascular sin agotarte.',
+          icon: Icons.directions_walk_outlined,
+        ),
+        WeeklyPlanDay(
+          day: 'Día 3',
+          title: 'Full body B',
+          type: 'Fuerza',
+          description:
+              'Segunda sesión de fuerza con patrón parecido, pero cuidando fatiga.',
+          focus: 'Repetir técnica y ganar confianza.',
+          icon: Icons.fitness_center_outlined,
+        ),
+        WeeklyPlanDay(
+          day: 'Día 4',
+          title: 'Descanso activo',
+          type: 'Recuperación',
+          description:
+              'Movimiento ligero, hidratación y sueño. Nada de sesión dura.',
+          focus: 'Llegar fresco al siguiente entrenamiento.',
+          icon: Icons.self_improvement_outlined,
+        ),
+        WeeklyPlanDay(
+          day: 'Día 5',
+          title: 'Full body C',
+          type: 'Fuerza',
+          description:
+              'Tercera sesión de fuerza de la semana. Misma prioridad: técnica y adherencia.',
+          focus: 'Cerrar la semana con buena ejecución.',
+          icon: Icons.fitness_center_outlined,
+        ),
+        WeeklyPlanDay(
+          day: 'Día 6',
+          title: 'Opcional adaptativo',
+          type: 'Opcional',
+          description:
+              'Solo se hace si la energía, el sueño y las molestias acompañan.',
+          focus: 'Puede ser cardio suave, movilidad o sesión mínima.',
+          icon: Icons.tune_outlined,
+        ),
+        WeeklyPlanDay(
+          day: 'Día 7',
+          title: 'Descanso',
+          type: 'Descanso',
+          description:
+              'Descanso real. Revisar cintura, peso medio, agua, pasos y sensaciones.',
+          focus: 'Preparar la siguiente semana sin quemarte.',
+          icon: Icons.bedtime_outlined,
+        ),
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Plan semanal'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 860),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const Text(
+                  'Semana 1 — Adaptación inteligente',
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Esta semana no busca reventarte. Busca construir base, técnica, rutina y recuperación. Si una señal diaria sale mal, el plan debe poder adaptarse.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.45,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 22),
+                _DashboardCard(
+                  icon: Icons.flag_outlined,
+                  title: 'Objetivo de la semana',
+                  description:
+                      'Empezar con 3 sesiones de fuerza, cardio suave y hábitos mínimos. La prioridad es adherencia, técnica y control de fatiga.',
+                  chips: [
+                    '3 fuerza',
+                    'Cardio suave',
+                    'Agua',
+                    'Pasos',
+                    'Sin machaque',
+                  ],
+                ),
+                const SizedBox(height: 18),
+                const _SectionTitle(
+                  icon: Icons.calendar_month_outlined,
+                  title: 'Distribución semanal',
+                ),
+                const SizedBox(height: 12),
+                ...weekOne.map(
+                  (planDay) => _WeeklyPlanDayCard(day: planDay),
+                ),
+                const SizedBox(height: 18),
+                _DashboardCard(
+                  icon: Icons.psychology_alt_outlined,
+                  title: 'Regla adaptativa',
+                  description:
+                      'Si registras energía muy baja, dolor o ansiedad alta por snacks, el día opcional no debe convertirse en una sesión dura. La app lo usará después para ajustar automáticamente.',
+                  chips: [
+                    'Energía',
+                    'Dolor',
+                    'Sueño',
+                    'Adherencia',
+                  ],
+                ),
+                const SizedBox(height: 28),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => WorkoutTodayScreen(data: data),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Abrir entrenamiento de hoy',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Volver al panel'),
                 ),
               ],
             ),
@@ -1828,6 +2034,78 @@ class WorkoutCompletedScreen extends StatelessWidget {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _WeeklyPlanDayCard extends StatelessWidget {
+  const _WeeklyPlanDayCard({
+    required this.day,
+  });
+
+  final WeeklyPlanDay day;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 14),
+      color: const Color(0xFF121821),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: Colors.white.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundColor:
+                  const Color(0xFF00E0A4).withValues(alpha: 0.16),
+              foregroundColor: const Color(0xFF00E0A4),
+              child: Icon(day.icon, size: 20),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${day.day} · ${day.type}',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: Colors.white.withValues(alpha: 0.55),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    day.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    day.description,
+                    style: TextStyle(
+                      fontSize: 14.5,
+                      height: 1.38,
+                      color: Colors.white.withValues(alpha: 0.72),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  _SmallChip(label: day.focus),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
