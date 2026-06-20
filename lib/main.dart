@@ -70,6 +70,18 @@ class UserAssessmentData {
   final bool hasNightShift;
 }
 
+class ExerciseAlternative {
+  const ExerciseAlternative({
+    required this.name,
+    required this.reason,
+    required this.techniqueNote,
+  });
+
+  final String name;
+  final String reason;
+  final String techniqueNote;
+}
+
 class WorkoutExercise {
   const WorkoutExercise({
     required this.name,
@@ -77,6 +89,9 @@ class WorkoutExercise {
     required this.reps,
     required this.rest,
     required this.techniqueNote,
+    this.alternatives = const [],
+    this.wasReplaced = false,
+    this.originalName,
   });
 
   final String name;
@@ -84,6 +99,22 @@ class WorkoutExercise {
   final String reps;
   final String rest;
   final String techniqueNote;
+  final List<ExerciseAlternative> alternatives;
+  final bool wasReplaced;
+  final String? originalName;
+
+  WorkoutExercise replacedBy(ExerciseAlternative alternative) {
+    return WorkoutExercise(
+      name: alternative.name,
+      sets: sets,
+      reps: reps,
+      rest: rest,
+      techniqueNote: alternative.techniqueNote,
+      alternatives: alternatives,
+      wasReplaced: true,
+      originalName: originalName ?? name,
+    );
+  }
 }
 
 class WorkoutTemplate {
@@ -109,6 +140,7 @@ class WorkoutLogData {
     required this.cardioCompleted,
     required this.freeNote,
     required this.workoutName,
+    required this.replacedExercisesCount,
   });
 
   final String feeling;
@@ -118,6 +150,7 @@ class WorkoutLogData {
   final bool cardioCompleted;
   final String freeNote;
   final String workoutName;
+  final int replacedExercisesCount;
 }
 
 class NutritionMeal {
@@ -184,6 +217,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Baja controlado, no bloquees las rodillas y mantén la espalda pegada al respaldo.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Sentadilla en multipower suave',
+            reason: 'Si la prensa está ocupada.',
+            techniqueNote:
+                'Baja hasta donde controles bien. Mantén torso firme y rodillas estables.',
+          ),
+          ExerciseAlternative(
+            name: 'Extensión de cuádriceps',
+            reason: 'Si quieres una opción más sencilla y guiada.',
+            techniqueNote:
+                'Sube controlado y baja lento. No bloquees fuerte la rodilla.',
+          ),
+          ExerciseAlternative(
+            name: 'Goblet squat con mancuerna',
+            reason: 'Si no hay máquinas disponibles.',
+            techniqueNote:
+                'Sujeta la mancuerna cerca del pecho y baja con control.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Jalón al pecho',
@@ -192,6 +245,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Lleva la barra hacia la parte alta del pecho, sin balancearte y juntando escápulas.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Jalón con agarre cómodo',
+            reason: 'Si el agarre original molesta.',
+            techniqueNote:
+                'Usa un agarre que no moleste hombros. Baja controlado hacia el pecho.',
+          ),
+          ExerciseAlternative(
+            name: 'Remo en máquina',
+            reason: 'Si el jalón está ocupado.',
+            techniqueNote:
+                'Pecho alto, codos hacia atrás y sin encoger hombros.',
+          ),
+          ExerciseAlternative(
+            name: 'Pullover en polea',
+            reason: 'Si quieres una alternativa más suave.',
+            techniqueNote:
+                'Brazos casi estirados, baja controlado y nota la espalda.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Press de pecho en máquina',
@@ -200,6 +273,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Empuja fuerte, controla la bajada y evita que los hombros se vayan hacia delante.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Press convergente en máquina',
+            reason: 'Si la máquina principal está ocupada.',
+            techniqueNote:
+                'Empuja con control y mantén los hombros protegidos.',
+          ),
+          ExerciseAlternative(
+            name: 'Press inclinado en máquina',
+            reason: 'Si quieres variar el ángulo.',
+            techniqueNote:
+                'Rango cómodo y estable. No fuerces el hombro.',
+          ),
+          ExerciseAlternative(
+            name: 'Aperturas en máquina',
+            reason: 'Si el press molesta.',
+            techniqueNote:
+                'Hazlo suave, sin estirar demasiado el hombro atrás.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Remo sentado en polea',
@@ -208,6 +301,26 @@ class AppWorkoutTemplates {
         rest: '75 s',
         techniqueNote:
             'Tira con la espalda, no con el cuello. Pecho alto y movimiento limpio.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Remo en máquina con pecho apoyado',
+            reason: 'Si quieres más estabilidad.',
+            techniqueNote:
+                'Apoya el pecho y tira con los codos sin encoger hombros.',
+          ),
+          ExerciseAlternative(
+            name: 'Remo con mancuerna apoyado',
+            reason: 'Si la polea está ocupada.',
+            techniqueNote:
+                'Apoya una mano, espalda neutra y tira sin girar el tronco.',
+          ),
+          ExerciseAlternative(
+            name: 'Jalón cerrado',
+            reason: 'Si no hay remos disponibles.',
+            techniqueNote:
+                'Baja con control y evita balancearte.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Elevaciones laterales',
@@ -216,6 +329,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Sube hasta la línea del hombro, sin impulso y con peso moderado.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Elevaciones laterales en polea',
+            reason: 'Si quieres más control.',
+            techniqueNote:
+                'Peso bajo, recorrido limpio y sin impulso.',
+          ),
+          ExerciseAlternative(
+            name: 'Máquina de hombro lateral',
+            reason: 'Si hay máquina disponible.',
+            techniqueNote:
+                'Ajusta el asiento y sube controlado.',
+          ),
+          ExerciseAlternative(
+            name: 'Face pull suave',
+            reason: 'Si las elevaciones molestan.',
+            techniqueNote:
+                'Tira hacia la cara con codos altos y sin dolor.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Plancha abdominal',
@@ -224,6 +357,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Aprieta abdomen y glúteos. No hundas la zona lumbar.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Dead bug',
+            reason: 'Si la plancha carga la lumbar.',
+            techniqueNote:
+                'Zona lumbar pegada al suelo. Movimiento lento y controlado.',
+          ),
+          ExerciseAlternative(
+            name: 'Pallof press',
+            reason: 'Si prefieres hacerlo de pie.',
+            techniqueNote:
+                'Resiste la rotación. Abdomen firme.',
+          ),
+          ExerciseAlternative(
+            name: 'Crunch en máquina suave',
+            reason: 'Si quieres opción guiada.',
+            techniqueNote:
+                'Recorrido corto y controlado, sin tirar del cuello.',
+          ),
+        ],
       ),
     ],
   );
@@ -241,6 +394,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Baja hasta donde controles bien. Rodillas estables y torso firme.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Prensa de piernas',
+            reason: 'Si prefieres opción guiada.',
+            techniqueNote:
+                'Espalda pegada al respaldo y rango cómodo.',
+          ),
+          ExerciseAlternative(
+            name: 'Hack squat suave',
+            reason: 'Si está disponible y te resulta cómoda.',
+            techniqueNote:
+                'No bajes más de lo que controles. Sin dolor de rodilla.',
+          ),
+          ExerciseAlternative(
+            name: 'Extensión de cuádriceps',
+            reason: 'Si necesitas algo más simple.',
+            techniqueNote:
+                'Subida controlada y bajada lenta.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Remo en máquina',
@@ -249,6 +422,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Pecho apoyado si es posible. Tira con codos y evita encoger hombros.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Remo sentado en polea',
+            reason: 'Si la máquina está ocupada.',
+            techniqueNote:
+                'Pecho alto y movimiento limpio.',
+          ),
+          ExerciseAlternative(
+            name: 'Remo con mancuerna apoyado',
+            reason: 'Si quieres trabajar unilateral.',
+            techniqueNote:
+                'Espalda neutra y codo hacia atrás.',
+          ),
+          ExerciseAlternative(
+            name: 'Jalón al pecho',
+            reason: 'Si no hay remo disponible.',
+            techniqueNote:
+                'Baja la barra hacia el pecho sin balanceo.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Press inclinado en máquina',
@@ -257,6 +450,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Controla la bajada y no fuerces el hombro. Rango cómodo y estable.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Press de pecho en máquina',
+            reason: 'Si el inclinado está ocupado.',
+            techniqueNote:
+                'Controla la bajada y mantén hombros atrás.',
+          ),
+          ExerciseAlternative(
+            name: 'Press con mancuernas ligero',
+            reason: 'Si no hay máquina disponible.',
+            techniqueNote:
+                'Usa poco peso y rango cómodo.',
+          ),
+          ExerciseAlternative(
+            name: 'Aperturas en máquina',
+            reason: 'Si el press molesta.',
+            techniqueNote:
+                'Movimiento suave, sin estirar demasiado atrás.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Curl femoral sentado o tumbado',
@@ -265,6 +478,26 @@ class AppWorkoutTemplates {
         rest: '75 s',
         techniqueNote:
             'Movimiento lento. Nota el trabajo en isquios, no en la zona lumbar.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Peso muerto rumano con mancuernas ligero',
+            reason: 'Si el curl femoral está ocupado.',
+            techniqueNote:
+                'Cadera atrás, espalda neutra y mancuernas cerca del cuerpo.',
+          ),
+          ExerciseAlternative(
+            name: 'Puente de glúteo',
+            reason: 'Si necesitas opción sencilla.',
+            techniqueNote:
+                'Sube apretando glúteo y baja controlado.',
+          ),
+          ExerciseAlternative(
+            name: 'Hip thrust en máquina',
+            reason: 'Si hay máquina disponible.',
+            techniqueNote:
+                'Empuja con talones y no hiperextiendas lumbar.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Face pull en polea',
@@ -273,6 +506,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Tira hacia la cara con codos altos. Ejercicio suave para hombro y postura.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Pájaros en máquina',
+            reason: 'Si la polea está ocupada.',
+            techniqueNote:
+                'Movimiento controlado y sin cargar cuello.',
+          ),
+          ExerciseAlternative(
+            name: 'Remo alto con cuerda suave',
+            reason: 'Si quieres algo parecido.',
+            techniqueNote:
+                'Codos altos, peso bajo y sin dolor.',
+          ),
+          ExerciseAlternative(
+            name: 'Elevaciones laterales suaves',
+            reason: 'Si quieres trabajar hombro sin polea.',
+            techniqueNote:
+                'Peso moderado y sin impulso.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Dead bug',
@@ -281,6 +534,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Zona lumbar pegada al suelo. Movimiento lento y controlado.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Plancha abdominal',
+            reason: 'Si prefieres isométrico.',
+            techniqueNote:
+                'Abdomen y glúteos apretados. No hundas lumbar.',
+          ),
+          ExerciseAlternative(
+            name: 'Pallof press',
+            reason: 'Si prefieres hacerlo de pie.',
+            techniqueNote:
+                'Resiste la rotación y mantén abdomen firme.',
+          ),
+          ExerciseAlternative(
+            name: 'Crunch en máquina suave',
+            reason: 'Si quieres opción guiada.',
+            techniqueNote:
+                'Movimiento corto, controlado y sin tirar del cuello.',
+          ),
+        ],
       ),
     ],
   );
@@ -298,6 +571,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Cadera atrás, espalda neutra y mancuernas pegadas al cuerpo. Sin dolor lumbar.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Curl femoral sentado o tumbado',
+            reason: 'Si el rumano molesta lumbar.',
+            techniqueNote:
+                'Movimiento lento y controlado. No levantes la cadera.',
+          ),
+          ExerciseAlternative(
+            name: 'Hip thrust en máquina',
+            reason: 'Si quieres opción más guiada.',
+            techniqueNote:
+                'Empuja con talones y evita hiperextender lumbar.',
+          ),
+          ExerciseAlternative(
+            name: 'Puente de glúteo',
+            reason: 'Si necesitas una alternativa sencilla.',
+            techniqueNote:
+                'Sube apretando glúteo y baja controlado.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Jalón agarre cómodo',
@@ -306,6 +599,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Usa el agarre que no moleste hombros. Baja controlado hacia el pecho.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Jalón al pecho',
+            reason: 'Si el agarre cómodo no está disponible.',
+            techniqueNote:
+                'Barra hacia la parte alta del pecho, sin balanceo.',
+          ),
+          ExerciseAlternative(
+            name: 'Remo sentado en polea',
+            reason: 'Si el jalón está ocupado.',
+            techniqueNote:
+                'Pecho alto y codos atrás.',
+          ),
+          ExerciseAlternative(
+            name: 'Pullover en polea',
+            reason: 'Si quieres opción más suave.',
+            techniqueNote:
+                'Brazos casi estirados y control total.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Press de pecho convergente o máquina',
@@ -314,6 +627,26 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'No busques máximo peso. Estabilidad, control y hombros protegidos.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Press de pecho en máquina',
+            reason: 'Si la convergente está ocupada.',
+            techniqueNote:
+                'Empuja controlado y mantén escápulas estables.',
+          ),
+          ExerciseAlternative(
+            name: 'Press inclinado en máquina',
+            reason: 'Si quieres cambiar el ángulo.',
+            techniqueNote:
+                'Rango cómodo y sin dolor de hombro.',
+          ),
+          ExerciseAlternative(
+            name: 'Aperturas en máquina',
+            reason: 'Si el press molesta.',
+            techniqueNote:
+                'Movimiento suave y controlado.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Extensión de cuádriceps',
@@ -322,6 +655,26 @@ class AppWorkoutTemplates {
         rest: '75 s',
         techniqueNote:
             'Sube controlado y baja lento. No bloquees fuerte la rodilla.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Prensa de piernas ligera',
+            reason: 'Si la extensión está ocupada.',
+            techniqueNote:
+                'Rango cómodo, sin bloquear rodillas.',
+          ),
+          ExerciseAlternative(
+            name: 'Sentadilla goblet suave',
+            reason: 'Si no hay máquinas disponibles.',
+            techniqueNote:
+                'Baja controlado y mantén torso firme.',
+          ),
+          ExerciseAlternative(
+            name: 'Step-up bajo',
+            reason: 'Si quieres opción sencilla.',
+            techniqueNote:
+                'Sube a una altura baja, controlando la rodilla.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Curl bíceps en polea o máquina',
@@ -330,6 +683,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Codos quietos y recorrido limpio. Sin balanceo.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Curl bíceps con mancuernas',
+            reason: 'Si la polea está ocupada.',
+            techniqueNote:
+                'Codos quietos y sin impulso.',
+          ),
+          ExerciseAlternative(
+            name: 'Curl martillo',
+            reason: 'Si quieres agarre más cómodo.',
+            techniqueNote:
+                'Palmas enfrentadas y movimiento controlado.',
+          ),
+          ExerciseAlternative(
+            name: 'Curl en banco inclinado ligero',
+            reason: 'Si quieres más control.',
+            techniqueNote:
+                'Peso bajo y recorrido limpio.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Press tríceps en polea',
@@ -338,6 +711,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Codos pegados al cuerpo. Extiende sin bloquear agresivamente.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Extensión tríceps con cuerda',
+            reason: 'Si quieres agarre más cómodo.',
+            techniqueNote:
+                'Codos quietos y abre la cuerda al final.',
+          ),
+          ExerciseAlternative(
+            name: 'Fondos asistidos en máquina',
+            reason: 'Si hay máquina y no molesta hombro.',
+            techniqueNote:
+                'Rango cómodo, sin bajar demasiado.',
+          ),
+          ExerciseAlternative(
+            name: 'Extensión tríceps por encima de la cabeza en polea',
+            reason: 'Si quieres cambiar el estímulo.',
+            techniqueNote:
+                'Peso bajo y codos estables.',
+          ),
+        ],
       ),
       WorkoutExercise(
         name: 'Pallof press',
@@ -346,6 +739,26 @@ class AppWorkoutTemplates {
         rest: '60 s',
         techniqueNote:
             'Resiste la rotación. Abdomen firme y respiración controlada.',
+        alternatives: [
+          ExerciseAlternative(
+            name: 'Dead bug',
+            reason: 'Si no hay polea disponible.',
+            techniqueNote:
+                'Zona lumbar pegada al suelo y movimiento lento.',
+          ),
+          ExerciseAlternative(
+            name: 'Plancha abdominal',
+            reason: 'Si prefieres isométrico.',
+            techniqueNote:
+                'Abdomen firme y sin hundir lumbar.',
+          ),
+          ExerciseAlternative(
+            name: 'Crunch en máquina suave',
+            reason: 'Si quieres opción guiada.',
+            techniqueNote:
+                'Controla el movimiento y evita tirar del cuello.',
+          ),
+        ],
       ),
     ],
   );
@@ -418,7 +831,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.2.0 — Entrenamientos A / B / C',
+                    'MVP v0.2.1 — Sustitución de ejercicios',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -956,7 +1369,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tu plan inicial ya está preparado. Ahora la semana distingue entrenamientos A, B y C.',
+                  'Tu plan inicial ya está preparado. Ahora puedes cambiar ejercicios si una máquina está ocupada o algo molesta.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.45,
@@ -980,7 +1393,7 @@ class DashboardScreen extends StatelessWidget {
                     '$recommendedStrengthDays días fuerza',
                     if (optionalDay) '1 día opcional',
                     'A / B / C',
-                    'Cardio suave',
+                    'Cambios seguros',
                   ],
                 ),
                 const SizedBox(height: 18),
@@ -1180,7 +1593,7 @@ class WeeklyPlanScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Ahora los días de fuerza tienen sesiones diferentes. Toca el Día 1, Día 3 o Día 5 para abrir su entrenamiento concreto.',
+                  'Los días de fuerza tienen sesiones diferentes. Toca el Día 1, Día 3 o Día 5 para abrir su entrenamiento concreto.',
                   style: TextStyle(
                     fontSize: 16,
                     height: 1.45,
@@ -1197,7 +1610,7 @@ class WeeklyPlanScreen extends StatelessWidget {
                     'Full body A',
                     'Full body B',
                     'Full body C',
-                    'Cardio suave',
+                    'Cambios seguros',
                     'Sin machaque',
                   ],
                 ),
@@ -1819,14 +2232,26 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   bool _hasPain = false;
   bool _cardioCompleted = false;
 
+  late List<WorkoutExercise> _currentExercises;
+
   final _painNoteController = TextEditingController();
   final _freeNoteController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _currentExercises = List<WorkoutExercise>.from(widget.workout.exercises);
+  }
 
   @override
   void dispose() {
     _painNoteController.dispose();
     _freeNoteController.dispose();
     super.dispose();
+  }
+
+  int get replacedExercisesCount {
+    return _currentExercises.where((exercise) => exercise.wasReplaced).length;
   }
 
   void _completeWorkout() {
@@ -1840,6 +2265,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
       painNote: _painNoteController.text.trim(),
       cardioCompleted: _cardioCompleted,
       freeNote: _freeNoteController.text.trim(),
+      replacedExercisesCount: replacedExercisesCount,
     );
 
     Navigator.of(context).push(
@@ -1860,6 +2286,95 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
     }
 
     return null;
+  }
+
+  void _replaceExercise(int index) {
+    final exercise = _currentExercises[index];
+
+    if (exercise.alternatives.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Este ejercicio aún no tiene alternativas.'),
+        ),
+      );
+      return;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0B0F14),
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+            children: [
+              Text(
+                'Cambiar ${exercise.name}',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Elige una alternativa si la máquina está ocupada, no tienes el material o notas molestia.',
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.4,
+                  color: Colors.white.withValues(alpha: 0.68),
+                ),
+              ),
+              const SizedBox(height: 18),
+              ...exercise.alternatives.map(
+                (alternative) => Card(
+                  color: const Color(0xFF121821),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    side: BorderSide(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.swap_horiz,
+                      color: Color(0xFF00E0A4),
+                    ),
+                    title: Text(
+                      alternative.name,
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    subtitle: Text(
+                      alternative.reason,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.62),
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() {
+                        _currentExercises[index] =
+                            exercise.replacedBy(alternative);
+                      });
+
+                      Navigator.of(context).pop();
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '${exercise.name} cambiado por ${alternative.name}',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -1903,16 +2418,31 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                     schedule: hasNightShiftText,
                     workoutName: widget.workout.subtitle,
                   ),
+                  if (replacedExercisesCount > 0) ...[
+                    const SizedBox(height: 14),
+                    _DashboardCard(
+                      icon: Icons.swap_horiz,
+                      title: 'Ejercicios cambiados',
+                      description:
+                          'Has cambiado $replacedExercisesCount ejercicio(s) en esta sesión. La app lo tendrá en cuenta en próximas versiones.',
+                      chips: const [
+                        'Adaptación',
+                        'Seguridad',
+                        'Flexibilidad',
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 22),
                   const _SectionTitle(
                     icon: Icons.fitness_center_outlined,
                     title: 'Ejercicios',
                   ),
                   const SizedBox(height: 12),
-                  ...widget.workout.exercises.asMap().entries.map(
+                  ..._currentExercises.asMap().entries.map(
                         (entry) => _ExerciseCard(
                           number: entry.key + 1,
                           exercise: entry.value,
+                          onReplace: () => _replaceExercise(entry.key),
                         ),
                       ),
                   const SizedBox(height: 18),
@@ -1951,11 +2481,26 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                       labelText: 'Sensación general',
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'Muy mal', child: Text('Muy mal')),
-                      DropdownMenuItem(value: 'Cansado', child: Text('Cansado')),
-                      DropdownMenuItem(value: 'Normal', child: Text('Normal')),
-                      DropdownMenuItem(value: 'Bien', child: Text('Bien')),
-                      DropdownMenuItem(value: 'Muy bien', child: Text('Muy bien')),
+                      DropdownMenuItem(
+                        value: 'Muy mal',
+                        child: Text('Muy mal'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Cansado',
+                        child: Text('Cansado'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Normal',
+                        child: Text('Normal'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Bien',
+                        child: Text('Bien'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Muy bien',
+                        child: Text('Muy bien'),
+                      ),
                     ],
                     onChanged: (value) {
                       if (value == null) return;
@@ -2079,6 +2624,10 @@ class WorkoutCompletedScreen extends StatelessWidget {
       return 'Próxima recomendación: revisar el ejercicio donde hubo molestia y preparar una alternativa segura.';
     }
 
+    if (log.replacedExercisesCount >= 2) {
+      return 'Próxima recomendación: revisar si el gimnasio tenía máquinas ocupadas o si la sesión necesita alternativas más directas.';
+    }
+
     if (log.difficulty >= 8) {
       return 'Próxima recomendación: mantener el mismo nivel. No subimos carga todavía porque la sesión fue dura.';
     }
@@ -2134,6 +2683,7 @@ class WorkoutCompletedScreen extends StatelessWidget {
                     'Entrenamiento: ${log.workoutName}',
                     'Sensación general: ${log.feeling}',
                     'Dificultad percibida: ${log.difficulty}/10',
+                    'Ejercicios cambiados: ${log.replacedExercisesCount}',
                     log.cardioCompleted
                         ? 'Cardio suave completado.'
                         : 'Cardio suave no completado.',
@@ -2256,7 +2806,8 @@ class _WeeklyPlanDayCard extends StatelessWidget {
                       runSpacing: 8,
                       children: [
                         _SmallChip(label: day.focus),
-                        if (isWorkout) const _SmallChip(label: 'Tocar para abrir'),
+                        if (isWorkout)
+                          const _SmallChip(label: 'Tocar para abrir'),
                       ],
                     ),
                   ],
@@ -2469,10 +3020,12 @@ class _ExerciseCard extends StatelessWidget {
   const _ExerciseCard({
     required this.number,
     required this.exercise,
+    required this.onReplace,
   });
 
   final int number;
   final WorkoutExercise exercise;
+  final VoidCallback onReplace;
 
   @override
   Widget build(BuildContext context) {
@@ -2483,7 +3036,9 @@ class _ExerciseCard extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: exercise.wasReplaced
+              ? const Color(0xFFFFC857).withValues(alpha: 0.35)
+              : Colors.white.withValues(alpha: 0.08),
         ),
       ),
       child: Padding(
@@ -2492,9 +3047,12 @@ class _ExerciseCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             CircleAvatar(
-              backgroundColor:
-                  const Color(0xFF00E0A4).withValues(alpha: 0.16),
-              foregroundColor: const Color(0xFF00E0A4),
+              backgroundColor: exercise.wasReplaced
+                  ? const Color(0xFFFFC857).withValues(alpha: 0.16)
+                  : const Color(0xFF00E0A4).withValues(alpha: 0.16),
+              foregroundColor: exercise.wasReplaced
+                  ? const Color(0xFFFFC857)
+                  : const Color(0xFF00E0A4),
               child: Text(
                 '$number',
                 style: const TextStyle(fontWeight: FontWeight.w900),
@@ -2505,6 +3063,18 @@ class _ExerciseCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (exercise.wasReplaced && exercise.originalName != null) ...[
+                    Text(
+                      'Cambiado desde: ${exercise.originalName}',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        color: const Color(0xFFFFC857)
+                            .withValues(alpha: 0.85),
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                  ],
                   Text(
                     exercise.name,
                     style: const TextStyle(
@@ -2530,6 +3100,12 @@ class _ExerciseCard extends StatelessWidget {
                       height: 1.38,
                       color: Colors.white.withValues(alpha: 0.70),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: onReplace,
+                    icon: const Icon(Icons.swap_horiz),
+                    label: const Text('Cambiar ejercicio'),
                   ),
                 ],
               ),
