@@ -92,15 +92,16 @@ class _HabitsScreenState extends State<HabitsScreen> {
       note: _noteController.text.trim(),
     );
 
-    await LocalStorageService.saveLastHabits(
-      SavedHabitsSummary(
-        waterGlasses: log.waterGlasses,
-        steps: log.steps,
-        energy: log.energy,
-        snackAnxiety: log.snackAnxiety,
-        savedAtText: DateTime.now().toLocal().toString(),
-      ),
+    final summary = SavedHabitsSummary(
+      waterGlasses: log.waterGlasses,
+      steps: log.steps,
+      energy: log.energy,
+      snackAnxiety: log.snackAnxiety,
+      savedAtText: DateTime.now().toLocal().toString(),
     );
+
+    await LocalStorageService.saveLastHabits(summary);
+    await LocalStorageService.saveHabitsToHistory(summary);
 
     if (!mounted) return;
 

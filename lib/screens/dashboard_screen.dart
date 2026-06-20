@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../data/app_workout_templates.dart';
 import '../models/saved_habits_summary.dart';
 import '../models/saved_workout_summary.dart';
 import '../models/user_assessment_data.dart';
@@ -10,12 +9,12 @@ import '../widgets/dashboard_card.dart';
 import '../widgets/main_status_card.dart';
 import '../widgets/metric_box.dart';
 import '../widgets/section_title.dart';
+import 'habits_history_screen.dart';
 import 'habits_screen.dart';
 import 'nutrition_screen.dart';
 import 'weekly_plan_screen.dart';
 import 'welcome_screen.dart';
 import 'workout_history_screen.dart';
-import 'workout_today_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({
@@ -24,17 +23,6 @@ class DashboardScreen extends StatelessWidget {
   });
 
   final UserAssessmentData data;
-
-  void _goToWorkoutToday(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => WorkoutTodayScreen(
-          data: data,
-          workout: AppWorkoutTemplates.fullBodyA,
-        ),
-      ),
-    );
-  }
 
   void _goToNutrition(BuildContext context) {
     Navigator.of(context).push(
@@ -64,6 +52,14 @@ class DashboardScreen extends StatelessWidget {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const WorkoutHistoryScreen(),
+      ),
+    );
+  }
+
+  void _goToHabitsHistory(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const HabitsHistoryScreen(),
       ),
     );
   }
@@ -202,9 +198,9 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 ActionTile(
                   icon: Icons.fitness_center_outlined,
-                  title: 'Ver entrenamiento de hoy',
-                  subtitle: 'Por defecto abre Full body A.',
-                  onTap: () => _goToWorkoutToday(context),
+                  title: 'Elegir entrenamiento de hoy',
+                  subtitle: 'Abre el plan semanal y selecciona Día 1, 3 o 5.',
+                  onTap: () => _goToWeeklyPlan(context),
                 ),
                 ActionTile(
                   icon: Icons.restaurant_outlined,
@@ -223,6 +219,12 @@ class DashboardScreen extends StatelessWidget {
                   title: 'Historial de entrenamientos',
                   subtitle: 'Consulta los últimos entrenamientos guardados.',
                   onTap: () => _goToWorkoutHistory(context),
+                ),
+                ActionTile(
+                  icon: Icons.water_drop,
+                  title: 'Historial de hábitos',
+                  subtitle: 'Consulta los últimos registros de agua y pasos.',
+                  onTap: () => _goToHabitsHistory(context),
                 ),
                 const SizedBox(height: 18),
                 const SectionTitle(

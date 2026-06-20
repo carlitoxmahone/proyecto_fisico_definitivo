@@ -1,36 +1,36 @@
 import 'package:flutter/material.dart';
 
-import '../models/saved_workout_summary.dart';
+import '../models/saved_habits_summary.dart';
 import '../services/local_storage_service.dart';
 import '../widgets/section_title.dart';
 
-class WorkoutHistoryScreen extends StatefulWidget {
-  const WorkoutHistoryScreen({super.key});
+class HabitsHistoryScreen extends StatefulWidget {
+  const HabitsHistoryScreen({super.key});
 
   @override
-  State<WorkoutHistoryScreen> createState() => _WorkoutHistoryScreenState();
+  State<HabitsHistoryScreen> createState() => _HabitsHistoryScreenState();
 }
 
-class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
-  late final Future<List<SavedWorkoutSummary>> _historyFuture;
+class _HabitsHistoryScreenState extends State<HabitsHistoryScreen> {
+  late final Future<List<SavedHabitsSummary>> _historyFuture;
 
   @override
   void initState() {
     super.initState();
-    _historyFuture = LocalStorageService.getWorkoutHistory();
+    _historyFuture = LocalStorageService.getHabitsHistory();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Historial de entrenamientos'),
+        title: const Text('Historial de hábitos'),
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 820),
-            child: FutureBuilder<List<SavedWorkoutSummary>>(
+            child: FutureBuilder<List<SavedHabitsSummary>>(
               future: _historyFuture,
               builder: (context, snapshot) {
                 final history = snapshot.data ?? [];
@@ -40,7 +40,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                   children: [
                     const SectionTitle(
                       icon: Icons.history,
-                      title: 'Historial de entrenamientos',
+                      title: 'Historial de hábitos',
                     ),
                     const SizedBox(height: 12),
                     if (history.isEmpty)
@@ -56,7 +56,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                         child: Padding(
                           padding: const EdgeInsets.all(18),
                           child: Text(
-                            'Aún no hay entrenamientos guardados. Completa uno para verlo aquí.',
+                            'Aún no hay registros de hábitos guardados. Guarda uno para verlo aquí.',
                             style: TextStyle(
                               fontSize: 15,
                               height: 1.4,
@@ -67,7 +67,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                       )
                     else
                       ...history.map(
-                        (item) => _WorkoutHistoryCard(summary: item),
+                        (item) => _HabitsHistoryCard(summary: item),
                       ),
                   ],
                 );
@@ -80,12 +80,12 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
   }
 }
 
-class _WorkoutHistoryCard extends StatelessWidget {
-  const _WorkoutHistoryCard({
+class _HabitsHistoryCard extends StatelessWidget {
+  const _HabitsHistoryCard({
     required this.summary,
   });
 
-  final SavedWorkoutSummary summary;
+  final SavedHabitsSummary summary;
 
   @override
   Widget build(BuildContext context) {
@@ -105,18 +105,10 @@ class _WorkoutHistoryCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              summary.workoutName,
-              style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w900,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
               summary.savedAtText,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.white.withValues(alpha: 0.55),
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
               ),
             ),
             const SizedBox(height: 12),
@@ -124,20 +116,11 @@ class _WorkoutHistoryCard extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _HistoryChip(label: 'Sensación: ${summary.feeling}'),
-                _HistoryChip(label: 'Dificultad ${summary.difficulty}/10'),
+                _HistoryChip(label: '${summary.waterGlasses} vasos'),
+                _HistoryChip(label: '${summary.steps} pasos'),
+                _HistoryChip(label: 'Energía ${summary.energy}/10'),
                 _HistoryChip(
-                  label: summary.cardioCompleted ? 'Cardio sí' : 'Cardio no',
-                ),
-                _HistoryChip(
-                  label: 'Cambios: ${summary.replacedExercisesCount}',
-                ),
-                _HistoryChip(
-                  label:
-                      'Rendimiento: ${summary.registeredPerformanceCount}',
-                ),
-                _HistoryChip(
-                  label: summary.hasPain ? 'Con molestia' : 'Sin molestia',
+                  label: 'Snacks ${summary.snackAnxiety}/10',
                 ),
               ],
             ),

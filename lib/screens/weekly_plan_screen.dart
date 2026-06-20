@@ -172,23 +172,6 @@ class WeeklyPlanScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 28),
-                SizedBox(
-                  height: 56,
-                  child: FilledButton(
-                    onPressed: () => _openWorkout(
-                      context,
-                      AppWorkoutTemplates.fullBodyA,
-                    ),
-                    child: const Text(
-                      'Abrir Full body A',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 14),
                 OutlinedButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: const Text('Volver al panel'),
@@ -201,4 +184,3 @@ class WeeklyPlanScreen extends StatelessWidget {
     );
   }
 }
-

@@ -69,7 +69,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.2.6 — Historial simple de entrenamientos',
+                    'MVP v0.2.7 — Historial simple de hábitos',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
