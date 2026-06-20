@@ -20,10 +20,54 @@ class ProyectoFisicoApp extends StatelessWidget {
           seedColor: const Color(0xFF00E0A4),
           brightness: Brightness.dark,
         ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFF121821),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: Colors.white.withValues(alpha: 0.12),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(
+              color: Color(0xFF00E0A4),
+              width: 1.6,
+            ),
+          ),
+        ),
       ),
       home: const WelcomeScreen(),
     );
   }
+}
+
+class UserAssessmentData {
+  const UserAssessmentData({
+    required this.name,
+    required this.age,
+    required this.heightCm,
+    required this.weightKg,
+    required this.waistCm,
+    required this.currentGoal,
+    required this.visualGoal,
+    required this.trainingDays,
+    required this.hasNightShift,
+  });
+
+  final String name;
+  final String age;
+  final String heightCm;
+  final String weightKg;
+  final String waistCm;
+  final String currentGoal;
+  final String visualGoal;
+  final String trainingDays;
+  final bool hasNightShift;
 }
 
 class WelcomeScreen extends StatelessWidget {
@@ -94,7 +138,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.1.2 — Navegación inicial',
+                    'MVP v0.1.3 — Formulario básico',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
@@ -111,97 +155,311 @@ class WelcomeScreen extends StatelessWidget {
   }
 }
 
-class AssessmentScreen extends StatelessWidget {
+class AssessmentScreen extends StatefulWidget {
   const AssessmentScreen({super.key});
+
+  @override
+  State<AssessmentScreen> createState() => _AssessmentScreenState();
+}
+
+class _AssessmentScreenState extends State<AssessmentScreen> {
+  final _formKey = GlobalKey<FormState>();
+
+  final _nameController = TextEditingController(text: 'Carlos');
+  final _ageController = TextEditingController(text: '35');
+  final _heightController = TextEditingController(text: '170');
+  final _weightController = TextEditingController(text: '87');
+  final _waistController = TextEditingController(text: '108');
+  final _trainingDaysController = TextEditingController(text: '5');
+
+  String _currentGoal = 'Recomposición corporal';
+  String _visualGoal = 'Grande y musculoso';
+  bool _hasNightShift = true;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    _waistController.dispose();
+    _trainingDaysController.dispose();
+    super.dispose();
+  }
+
+  void _generateDiagnosis() {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    final data = UserAssessmentData(
+      name: _nameController.text.trim(),
+      age: _ageController.text.trim(),
+      heightCm: _heightController.text.trim(),
+      weightKg: _weightController.text.trim(),
+      waistCm: _waistController.text.trim(),
+      currentGoal: _currentGoal,
+      visualGoal: _visualGoal,
+      trainingDays: _trainingDaysController.text.trim(),
+      hasNightShift: _hasNightShift,
+    );
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => DiagnosisScreen(data: data),
+      ),
+    );
+  }
+
+  String? _requiredNumberValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Este dato es obligatorio';
+    }
+
+    final number = num.tryParse(value.replaceAll(',', '.'));
+
+    if (number == null) {
+      return 'Introduce un número válido';
+    }
+
+    if (number <= 0) {
+      return 'El número debe ser mayor que 0';
+    }
+
+    return null;
+  }
+
+  String? _requiredTextValidator(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Este dato es obligatorio';
+    }
+
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Evaluación inicial'),
-        centerTitle: false,
       ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 640),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Form(
+              key: _formKey,
               child: ListView(
+                padding: const EdgeInsets.all(24),
                 children: [
-                  const SizedBox(height: 8),
                   const Text(
-                    'Vamos a conocerte antes de crear tu plan',
+                    'Datos básicos',
                     style: TextStyle(
-                      fontSize: 28,
+                      fontSize: 30,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.6,
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
                   Text(
-                    'Esta evaluación servirá para construir tu perfil físico, tu objetivo, tu horario, tu nivel de entrenamiento y tu estrategia inicial.',
+                    'Esta primera versión recoge los datos mínimos para generar un diagnóstico inicial. Más adelante dividiremos la evaluación en varias pantallas.',
                     style: TextStyle(
                       fontSize: 16,
                       height: 1.45,
-                      color: Colors.white.withValues(alpha: 0.75),
+                      color: Colors.white.withValues(alpha: 0.72),
                     ),
                   ),
                   const SizedBox(height: 28),
-                  const AssessmentInfoCard(
-                    icon: Icons.monitor_weight_outlined,
-                    title: 'Datos físicos',
-                    description:
-                        'Altura, peso, cintura y punto de partida real.',
+                  _SectionTitle(
+                    icon: Icons.person_outline,
+                    title: 'Perfil físico',
                   ),
-                  const AssessmentInfoCard(
-                    icon: Icons.flag_outlined,
-                    title: 'Objetivo',
-                    description:
-                        'Recomposición, fuerza, cardio, estética y prioridades.',
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _nameController,
+                    validator: _requiredTextValidator,
+                    textInputAction: TextInputAction.next,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre',
+                      hintText: 'Ejemplo: Carlos',
+                    ),
                   ),
-                  const AssessmentInfoCard(
-                    icon: Icons.schedule_outlined,
-                    title: 'Horario real',
-                    description:
-                        'Turno nocturno, sueño, entrenamiento y comidas.',
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _ageController,
+                          validator: _requiredNumberValidator,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'Edad',
+                            suffixText: 'años',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _heightController,
+                          validator: _requiredNumberValidator,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'Altura',
+                            suffixText: 'cm',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                  const AssessmentInfoCard(
-                    icon: Icons.fitness_center_outlined,
-                    title: 'Entrenamiento',
-                    description:
-                        'Disponibilidad, gimnasio, nivel y fatiga actual.',
-                  ),
-                  const AssessmentInfoCard(
-                    icon: Icons.restaurant_outlined,
-                    title: 'Nutrición',
-                    description:
-                        'Comidas, agua, proteína, snacks y método de control.',
-                  ),
-                  const AssessmentInfoCard(
-                    icon: Icons.health_and_safety_outlined,
-                    title: 'Seguridad',
-                    description:
-                        'Dolores, lesiones, limitaciones y señales de alarma.',
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _weightController,
+                          validator: _requiredNumberValidator,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'Peso actual',
+                            suffixText: 'kg',
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: TextFormField(
+                          controller: _waistController,
+                          validator: _requiredNumberValidator,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          decoration: const InputDecoration(
+                            labelText: 'Cintura',
+                            suffixText: 'cm',
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 28),
+                  _SectionTitle(
+                    icon: Icons.flag_outlined,
+                    title: 'Objetivo',
+                  ),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(
+                    value: _currentGoal,
+                    decoration: const InputDecoration(
+                      labelText: 'Objetivo actual',
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Perder grasa',
+                        child: Text('Perder grasa'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Ganar músculo',
+                        child: Text('Ganar músculo'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Recomposición corporal',
+                        child: Text('Recomposición corporal'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Ganar fuerza',
+                        child: Text('Ganar fuerza'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Mejorar salud y forma física',
+                        child: Text('Mejorar salud y forma física'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _currentGoal = value);
+                    },
+                  ),
+                  const SizedBox(height: 14),
+                  DropdownButtonFormField<String>(
+                    value: _visualGoal,
+                    decoration: const InputDecoration(
+                      labelText: 'Objetivo visual',
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Atlético y definido',
+                        child: Text('Atlético y definido'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Grande y musculoso',
+                        child: Text('Grande y musculoso'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Delgado y marcado',
+                        child: Text('Delgado y marcado'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Fuerte, ancho y compacto',
+                        child: Text('Fuerte, ancho y compacto'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Equilibrado, sano y estético',
+                        child: Text('Equilibrado, sano y estético'),
+                      ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(() => _visualGoal = value);
+                    },
+                  ),
+                  const SizedBox(height: 28),
+                  _SectionTitle(
+                    icon: Icons.fitness_center_outlined,
+                    title: 'Entrenamiento y horario',
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _trainingDaysController,
+                    validator: _requiredNumberValidator,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                    decoration: const InputDecoration(
+                      labelText: 'Días reales disponibles por semana',
+                      suffixText: 'días',
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  SwitchListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 4),
+                    value: _hasNightShift,
+                    activeThumbColor: const Color(0xFF00E0A4),
+                    title: const Text(
+                      'Trabajo en turno nocturno',
+                      style: TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    subtitle: Text(
+                      'Activa el modo de comidas, entrenamiento y recuperación adaptado a la noche.',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.62),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() => _hasNightShift = value);
+                    },
+                  ),
+                  const SizedBox(height: 30),
                   SizedBox(
                     height: 56,
                     child: FilledButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Siguiente versión: formulario real de evaluación',
-                            ),
-                          ),
-                        );
-                      },
+                      onPressed: _generateDiagnosis,
                       child: const Text(
-                        'Continuar',
+                        'Generar diagnóstico',
                         style: TextStyle(
                           fontSize: 17,
-                          fontWeight: FontWeight.w700,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
                     ),
@@ -221,17 +479,176 @@ class AssessmentScreen extends StatelessWidget {
   }
 }
 
-class AssessmentInfoCard extends StatelessWidget {
-  const AssessmentInfoCard({
+class DiagnosisScreen extends StatelessWidget {
+  const DiagnosisScreen({
     super.key,
+    required this.data,
+  });
+
+  final UserAssessmentData data;
+
+  @override
+  Widget build(BuildContext context) {
+    final waist = num.tryParse(data.waistCm.replaceAll(',', '.')) ?? 0;
+    final height = num.tryParse(data.heightCm.replaceAll(',', '.')) ?? 0;
+    final waistHeightRatio = height > 0 ? waist / height : 0;
+
+    final isRecomposition =
+        data.currentGoal.toLowerCase().contains('recomposición');
+
+    final showNoBulkWarning =
+        data.visualGoal == 'Grande y musculoso' && waistHeightRatio >= 0.6;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Diagnóstico inicial'),
+      ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 760),
+            child: ListView(
+              padding: const EdgeInsets.all(24),
+              children: [
+                const Text(
+                  'Tu punto de partida',
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: -0.7,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Este diagnóstico es una primera interpretación. Más adelante la app lo ajustará con tus entrenamientos, medidas, energía y adherencia.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    height: 1.45,
+                    color: Colors.white.withValues(alpha: 0.72),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _DiagnosisCard(
+                  icon: Icons.person_outline,
+                  title: 'Perfil físico',
+                  lines: [
+                    '${data.name}, ${data.age} años',
+                    '${data.heightCm} cm · ${data.weightKg} kg',
+                    'Cintura: ${data.waistCm} cm',
+                    if (waistHeightRatio > 0)
+                      'Ratio cintura/altura aproximada: ${waistHeightRatio.toStringAsFixed(2)}',
+                  ],
+                ),
+                _DiagnosisCard(
+                  icon: Icons.flag_outlined,
+                  title: 'Objetivo',
+                  lines: [
+                    'Objetivo actual: ${data.currentGoal}',
+                    'Objetivo visual: ${data.visualGoal}',
+                    if (isRecomposition)
+                      'Estrategia inicial: perder grasa y ganar músculo de forma progresiva.',
+                    if (showNoBulkWarning)
+                      'No se recomienda empezar con volumen: primero reduciremos cintura mientras subimos fuerza.',
+                  ],
+                ),
+                _DiagnosisCard(
+                  icon: Icons.schedule_outlined,
+                  title: 'Horario y entrenamiento',
+                  lines: [
+                    'Días disponibles: ${data.trainingDays} por semana',
+                    if (data.hasNightShift)
+                      'Modo turno nocturno activado.'
+                    else
+                      'Horario estándar activado.',
+                    'Fase recomendada: adaptación inicial.',
+                  ],
+                ),
+                _DiagnosisCard(
+                  icon: Icons.auto_graph_outlined,
+                  title: 'Estrategia recomendada',
+                  lines: [
+                    '3 días de fuerza full body estratégica.',
+                    'Cardio suave y progresivo.',
+                    'Control de cintura, fuerza, pasos, agua y energía.',
+                    'Nutrición adaptada al horario real.',
+                  ],
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 56,
+                  child: FilledButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Siguiente versión: Dashboard inicial',
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Crear mi primer plan',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Editar respuestas'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
     required this.icon,
     required this.title,
-    required this.description,
   });
 
   final IconData icon;
   final String title;
-  final String description;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          color: const Color(0xFF00E0A4),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DiagnosisCard extends StatelessWidget {
+  const _DiagnosisCard({
+    required this.icon,
+    required this.title,
+    required this.lines,
+  });
+
+  final IconData icon;
+  final String title;
+  final List<String> lines;
 
   @override
   Widget build(BuildContext context) {
@@ -264,16 +681,21 @@ class AssessmentInfoCard extends StatelessWidget {
                     title,
                     style: const TextStyle(
                       fontSize: 17,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w900,
                     ),
                   ),
-                  const SizedBox(height: 6),
-                  Text(
-                    description,
-                    style: TextStyle(
-                      fontSize: 14.5,
-                      height: 1.35,
-                      color: Colors.white.withValues(alpha: 0.68),
+                  const SizedBox(height: 8),
+                  ...lines.map(
+                    (line) => Padding(
+                      padding: const EdgeInsets.only(bottom: 5),
+                      child: Text(
+                        '• $line',
+                        style: TextStyle(
+                          fontSize: 14.5,
+                          height: 1.35,
+                          color: Colors.white.withValues(alpha: 0.72),
+                        ),
+                      ),
                     ),
                   ),
                 ],
