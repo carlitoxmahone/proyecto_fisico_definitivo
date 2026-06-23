@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/saved_habits_summary.dart';
 import '../models/saved_workout_summary.dart';
+import '../models/training_profile.dart';
 import '../models/user_assessment_data.dart';
 import '../services/local_storage_service.dart';
 import '../widgets/action_tile.dart';
@@ -12,17 +13,25 @@ import '../widgets/section_title.dart';
 import 'habits_history_screen.dart';
 import 'habits_screen.dart';
 import 'nutrition_screen.dart';
+import 'training_profile_screen.dart';
 import 'weekly_plan_screen.dart';
 import 'welcome_screen.dart';
 import 'workout_history_screen.dart';
 
-class DashboardScreen extends StatelessWidget {
+class DashboardScreen extends StatefulWidget {
   const DashboardScreen({
     super.key,
     required this.data,
   });
 
   final UserAssessmentData data;
+
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  UserAssessmentData get data => widget.data;
 
   void _goToNutrition(BuildContext context) {
     Navigator.of(context).push(
@@ -61,6 +70,59 @@ class DashboardScreen extends StatelessWidget {
       MaterialPageRoute(
         builder: (_) => const HabitsHistoryScreen(),
       ),
+    );
+  }
+
+  Future<void> _goToTrainingProfile(
+    BuildContext context,
+    TrainingProfile profile,
+  ) async {
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => TrainingProfileScreen(
+          initialProfile: profile,
+        ),
+      ),
+    );
+
+    if (!mounted || saved != true) return;
+    setState(() {});
+  }
+
+  Widget _buildTrainingProfileCard(
+    TrainingProfile profile,
+    bool hasSavedProfile,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 18),
+        const SectionTitle(
+          icon: Icons.psychology_alt_outlined,
+          title: 'Perfil de entrenamiento',
+        ),
+        const SizedBox(height: 12),
+        DashboardCard(
+          icon: Icons.manage_accounts_outlined,
+          title: hasSavedProfile
+              ? 'Perfil de entrenamiento'
+              : 'Define tu perfil de entrenamiento',
+          description: hasSavedProfile
+              ? profile.recommendedFocus
+              : 'Define tu perfil de entrenamiento para que la app pueda adaptar mejor las decisiones.',
+          chips: [
+            'Objetivo: ${profile.goal}',
+            'Nivel: ${profile.level}',
+            'Prioridad: ${profile.priority}',
+          ],
+        ),
+        const SizedBox(height: 10),
+        OutlinedButton.icon(
+          onPressed: () => _goToTrainingProfile(context, profile),
+          icon: const Icon(Icons.edit_outlined),
+          label: const Text('Editar perfil'),
+        ),
+      ],
     );
   }
 
@@ -371,6 +433,7 @@ class DashboardScreen extends StatelessWidget {
                     LocalStorageService.getLastHabits(),
                     LocalStorageService.getWorkoutHistory(),
                     LocalStorageService.getHabitsHistory(),
+                    LocalStorageService.getSavedTrainingProfile(),
                   ]),
                   builder: (context, snapshot) {
                     final values = snapshot.data;
@@ -380,9 +443,18 @@ class DashboardScreen extends StatelessWidget {
                         values?[2] as List<SavedWorkoutSummary>? ?? [];
                     final habitsHistory =
                         values?[3] as List<SavedHabitsSummary>? ?? [];
+                    final savedTrainingProfile =
+                        values?[4] as TrainingProfile?;
+                    final trainingProfile = savedTrainingProfile ??
+                        TrainingProfile.defaultProfile;
 
                     return Column(
                       children: [
+                        _buildTrainingProfileCard(
+                          trainingProfile,
+                          savedTrainingProfile != null,
+                        ),
+                        const SizedBox(height: 18),
                         _buildVisualDashboard(
                           context,
                           lastWorkout,

@@ -5,12 +5,35 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/saved_habits_summary.dart';
 import '../models/saved_workout_summary.dart';
+import '../models/training_profile.dart';
 
 class LocalStorageService {
   static const _lastWorkoutKey = 'last_workout_summary';
   static const _workoutHistoryKey = 'workout_history';
   static const _lastHabitsKey = 'last_habits_summary';
   static const _habitsHistoryKey = 'habits_history';
+  static const _trainingProfileKey = 'training_profile';
+
+  static Future<void> saveTrainingProfile(TrainingProfile profile) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_trainingProfileKey, jsonEncode(profile.toJson()));
+  }
+
+  static Future<TrainingProfile> getTrainingProfile() async {
+    return await getSavedTrainingProfile() ?? TrainingProfile.defaultProfile;
+  }
+
+  static Future<TrainingProfile?> getSavedTrainingProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
+    final rawJson = prefs.getString(_trainingProfileKey);
+    if (rawJson == null) return null;
+
+    final decoded = jsonDecode(rawJson);
+    if (decoded is! Map<String, dynamic>) return null;
+
+    return TrainingProfile.fromJson(decoded);
+  }
 
   static Future<void> saveLastWorkout(SavedWorkoutSummary summary) async {
     final prefs = await SharedPreferences.getInstance();
