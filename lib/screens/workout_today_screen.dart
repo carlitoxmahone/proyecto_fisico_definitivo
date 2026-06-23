@@ -124,6 +124,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
       performanceLogs: performanceLogs,
     );
 
+    final savedAt = DateTime.now().toLocal();
     final summary = SavedWorkoutSummary(
       workoutName: log.workoutName,
       feeling: log.feeling,
@@ -132,7 +133,8 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
       replacedExercisesCount: log.replacedExercisesCount,
       registeredPerformanceCount: log.registeredPerformanceCount,
       hasPain: log.hasPain,
-      savedAtText: DateTime.now().toLocal().toString(),
+      savedAtText: savedAt.toString(),
+      savedAtIso: savedAt.toIso8601String(),
     );
 
     await LocalStorageService.saveLastWorkout(summary);

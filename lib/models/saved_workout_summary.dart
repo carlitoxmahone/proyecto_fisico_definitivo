@@ -8,6 +8,7 @@ class SavedWorkoutSummary {
     required this.registeredPerformanceCount,
     required this.hasPain,
     required this.savedAtText,
+    this.savedAtIso,
   });
 
   final String workoutName;
@@ -18,6 +19,7 @@ class SavedWorkoutSummary {
   final int registeredPerformanceCount;
   final bool hasPain;
   final String savedAtText;
+  final String? savedAtIso;
 
   Map<String, dynamic> toJson() {
     return {
@@ -29,6 +31,7 @@ class SavedWorkoutSummary {
       'registeredPerformanceCount': registeredPerformanceCount,
       'hasPain': hasPain,
       'savedAtText': savedAtText,
+      'savedAtIso': savedAtIso,
     };
   }
 
@@ -43,6 +46,7 @@ class SavedWorkoutSummary {
           json['registeredPerformanceCount'] as int? ?? 0,
       hasPain: json['hasPain'] as bool? ?? false,
       savedAtText: json['savedAtText'] as String? ?? '',
+      savedAtIso: json['savedAtIso'] as String?,
     );
   }
 }

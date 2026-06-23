@@ -119,25 +119,76 @@ class DashboardScreen extends StatelessWidget {
     return (current / target).clamp(0, 1).toDouble();
   }
 
-  String _motivationMessage(
+  DateTime? _savedDate(String? isoText, String fallbackText) {
+    final parsedIso = isoText == null ? null : DateTime.tryParse(isoText);
+    if (parsedIso != null) return parsedIso;
+    return DateTime.tryParse(fallbackText);
+  }
+
+  bool _isThisWeek(DateTime date, DateTime now) {
+    final today = DateTime(now.year, now.month, now.day);
+    final weekStart = today.subtract(Duration(days: today.weekday - 1));
+    final nextWeekStart = weekStart.add(const Duration(days: 7));
+    final normalized = DateTime(date.year, date.month, date.day);
+
+    return !normalized.isBefore(weekStart) &&
+        normalized.isBefore(nextWeekStart);
+  }
+
+  _WeeklyGoalsSummary _weeklyGoalsSummary(
     List<SavedWorkoutSummary> workoutHistory,
     List<SavedHabitsSummary> habitsHistory,
+    SavedHabitsSummary? lastHabits,
   ) {
-    final workouts = workoutHistory.length;
-    final habits = habitsHistory.length;
-    final hasPendingCardio =
-        workoutHistory.isNotEmpty && !workoutHistory.first.cardioCompleted;
+    final now = DateTime.now();
+    final workoutsThisWeek = workoutHistory.where((item) {
+      final savedDate = _savedDate(item.savedAtIso, item.savedAtText);
+      return savedDate != null && _isThisWeek(savedDate, now);
+    }).toList();
+    final habitsThisWeek = habitsHistory.where((item) {
+      final savedDate = _savedDate(item.savedAtIso, item.savedAtText);
+      return savedDate != null && _isThisWeek(savedDate, now);
+    }).toList();
 
-    if (workouts == 0) {
-      return 'Hoy puede ser un buen día para empezar.';
+    return _WeeklyGoalsSummary(
+      workoutsDone: workoutsThisWeek.length,
+      cardioDone:
+          workoutsThisWeek.where((item) => item.cardioCompleted).length,
+      habitsDone: habitsThisWeek.length,
+      waterDone: (lastHabits?.waterGlasses ?? 0) >= 8,
+      stepsDone: (lastHabits?.steps ?? 0) >= 3500,
+    );
+  }
+
+  String _motivationMessage(
+    _WeeklyGoalsSummary weeklyGoals,
+  ) {
+    final missingWorkouts = 3 - weeklyGoals.workoutsDone;
+
+    if (weeklyGoals.workoutsDone == 0) {
+      return 'Toca arrancar la semana con el primer entrenamiento.';
     }
 
-    if (hasPendingCardio) {
-      return 'Te falta sumar un poco de cardio suave.';
+    if (weeklyGoals.workoutsDone >= 3 &&
+        weeklyGoals.cardioDone >= 3 &&
+        weeklyGoals.habitsDone >= 5) {
+      return 'Semana muy bien encaminada.';
     }
 
-    if (workouts >= 3 && habits >= 5) {
-      return 'Muy buena constancia, sigue así.';
+    if (missingWorkouts == 1) {
+      return 'Estás a un entrenamiento de cumplir la semana.';
+    }
+
+    if (weeklyGoals.cardioDone < 3) {
+      return 'Suma cardio suave para reforzar la base.';
+    }
+
+    if (weeklyGoals.habitsDone < 5) {
+      return 'Registrar hábitos mantiene el plan bajo control.';
+    }
+
+    if (weeklyGoals.workoutsDone >= 3) {
+      return 'Semana de fuerza completada. Muy buen trabajo.';
     }
 
     return 'Buen comienzo, sigue construyendo el hábito.';
@@ -157,30 +208,44 @@ class DashboardScreen extends StatelessWidget {
     List<SavedHabitsSummary> habitsHistory,
   ) {
     const workoutGoal = 3;
+    const cardioGoal = 3;
     const habitsGoal = 5;
 
-    final workoutsDone = workoutHistory.length.clamp(0, workoutGoal).toInt();
-    final habitsDone = habitsHistory.length.clamp(0, habitsGoal).toInt();
+    final weeklyGoals = _weeklyGoalsSummary(
+      workoutHistory,
+      habitsHistory,
+      lastHabits,
+    );
+    final workoutsDone =
+        weeklyGoals.workoutsDone.clamp(0, workoutGoal).toInt();
+    final cardioDone = weeklyGoals.cardioDone.clamp(0, cardioGoal).toInt();
+    final habitsDone = weeklyGoals.habitsDone.clamp(0, habitsGoal).toInt();
     final streak =
         (workoutHistory.length + habitsHistory.length).clamp(0, 7).toInt();
     final cardioCompleted = lastWorkout?.cardioCompleted ?? false;
     final waterGlasses = lastHabits?.waterGlasses ?? 0;
     final steps = lastHabits?.steps ?? 0;
-    final recommendedTitle = workoutHistory.isEmpty
+    final recommendedTitle = weeklyGoals.workoutsDone < workoutGoal
         ? 'Ir al plan semanal'
-        : habitsHistory.isEmpty
+        : weeklyGoals.habitsDone < habitsGoal
             ? 'Registrar hábitos de hoy'
-            : 'Ver historial de entrenamientos';
-    final recommendedDescription = workoutHistory.isEmpty
-        ? 'Elige Día 1, 3 o 5 y completa tu primera sesión.'
-        : habitsHistory.isEmpty
+            : weeklyGoals.cardioDone < cardioGoal
+                ? 'Sumar cardio suave'
+                : 'Revisar historial/progreso';
+    final recommendedDescription = weeklyGoals.workoutsDone < workoutGoal
+        ? 'Elige Día 1, 3 o 5 y suma una sesión de fuerza.'
+        : weeklyGoals.habitsDone < habitsGoal
             ? 'Añade agua, pasos y energía para completar la foto del día.'
-            : 'Revisa tu progreso reciente y sigue construyendo constancia.';
-    final recommendedAction = workoutHistory.isEmpty
+            : weeklyGoals.cardioDone < cardioGoal
+                ? 'Camina a ritmo cómodo y refuerza la base de la semana.'
+                : 'Revisa tus registros recientes y consolida el progreso.';
+    final recommendedAction = weeklyGoals.workoutsDone < workoutGoal
         ? () => _goToWeeklyPlan(context)
-        : habitsHistory.isEmpty
+        : weeklyGoals.habitsDone < habitsGoal
             ? () => _goToHabits(context)
-            : () => _goToWorkoutHistory(context);
+            : weeklyGoals.cardioDone < cardioGoal
+                ? () => _goToWeeklyPlan(context)
+                : () => _goToWorkoutHistory(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,10 +253,15 @@ class DashboardScreen extends StatelessWidget {
         _WeeklyProgressCard(
           workoutsDone: workoutsDone,
           workoutGoal: workoutGoal,
+          cardioDone: cardioDone,
+          cardioGoal: cardioGoal,
           habitsDone: habitsDone,
           habitsGoal: habitsGoal,
           workoutProgress: _progressValue(workoutsDone, workoutGoal),
+          cardioProgress: _progressValue(cardioDone, cardioGoal),
           habitsProgress: _progressValue(habitsDone, habitsGoal),
+          waterDone: weeklyGoals.waterDone,
+          stepsDone: weeklyGoals.stepsDone,
         ),
         const SizedBox(height: 14),
         Row(
@@ -205,7 +275,7 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(width: 12),
             Expanded(
               child: _MotivationCard(
-                message: _motivationMessage(workoutHistory, habitsHistory),
+                message: _motivationMessage(weeklyGoals),
               ),
             ),
           ],
@@ -230,7 +300,7 @@ class DashboardScreen extends StatelessWidget {
               icon: Icons.directions_walk_outlined,
               title: 'Pasos',
               value: '$steps pasos',
-              progress: _progressValue(steps, 5000),
+              progress: _progressValue(steps, 3500),
             ),
             _StatusIndicatorCard(
               icon: Icons.fitness_center_outlined,
@@ -445,18 +515,28 @@ class _WeeklyProgressCard extends StatelessWidget {
   const _WeeklyProgressCard({
     required this.workoutsDone,
     required this.workoutGoal,
+    required this.cardioDone,
+    required this.cardioGoal,
     required this.habitsDone,
     required this.habitsGoal,
     required this.workoutProgress,
+    required this.cardioProgress,
     required this.habitsProgress,
+    required this.waterDone,
+    required this.stepsDone,
   });
 
   final int workoutsDone;
   final int workoutGoal;
+  final int cardioDone;
+  final int cardioGoal;
   final int habitsDone;
   final int habitsGoal;
   final double workoutProgress;
+  final double cardioProgress;
   final double habitsProgress;
+  final bool waterDone;
+  final bool stepsDone;
 
   @override
   Widget build(BuildContext context) {
@@ -483,7 +563,7 @@ class _WeeklyProgressCard extends StatelessWidget {
                 ),
                 SizedBox(width: 12),
                 Text(
-                  'Semana en marcha',
+                  'Objetivos de la semana',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w900,
@@ -499,12 +579,81 @@ class _WeeklyProgressCard extends StatelessWidget {
             ),
             const SizedBox(height: 14),
             _ProgressLine(
+              label: 'Cardio suave',
+              value: '$cardioDone/$cardioGoal',
+              progress: cardioProgress,
+            ),
+            const SizedBox(height: 14),
+            _ProgressLine(
               label: 'Hábitos registrados',
               value: '$habitsDone/$habitsGoal',
               progress: habitsProgress,
             ),
+            const SizedBox(height: 16),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                _GoalStateChip(
+                  label: waterDone
+                      ? 'Agua de hoy cumplida'
+                      : 'Agua de hoy pendiente',
+                  done: waterDone,
+                ),
+                _GoalStateChip(
+                  label: stepsDone
+                      ? 'Pasos de hoy cumplidos'
+                      : 'Pasos de hoy pendientes',
+                  done: stepsDone,
+                ),
+              ],
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _WeeklyGoalsSummary {
+  const _WeeklyGoalsSummary({
+    required this.workoutsDone,
+    required this.cardioDone,
+    required this.habitsDone,
+    required this.waterDone,
+    required this.stepsDone,
+  });
+
+  final int workoutsDone;
+  final int cardioDone;
+  final int habitsDone;
+  final bool waterDone;
+  final bool stepsDone;
+}
+
+class _GoalStateChip extends StatelessWidget {
+  const _GoalStateChip({
+    required this.label,
+    required this.done,
+  });
+
+  final String label;
+  final bool done;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = done ? const Color(0xFF00E0A4) : const Color(0xFFFFC857);
+
+    return Chip(
+      avatar: Icon(
+        done ? Icons.check_circle_outline : Icons.schedule_outlined,
+        color: color,
+        size: 18,
+      ),
+      label: Text(label),
+      backgroundColor: color.withValues(alpha: 0.10),
+      side: BorderSide(
+        color: color.withValues(alpha: 0.18),
       ),
     );
   }

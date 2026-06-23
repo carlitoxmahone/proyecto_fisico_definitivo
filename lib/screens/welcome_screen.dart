@@ -69,7 +69,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.2.8 — Dashboard visual motivacional',
+                    'MVP v0.2.9 — Objetivos semanales básicos',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,

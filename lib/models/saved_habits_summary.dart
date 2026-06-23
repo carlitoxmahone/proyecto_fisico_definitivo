@@ -5,6 +5,7 @@ class SavedHabitsSummary {
     required this.energy,
     required this.snackAnxiety,
     required this.savedAtText,
+    this.savedAtIso,
   });
 
   final int waterGlasses;
@@ -12,6 +13,7 @@ class SavedHabitsSummary {
   final int energy;
   final int snackAnxiety;
   final String savedAtText;
+  final String? savedAtIso;
 
   Map<String, dynamic> toJson() {
     return {
@@ -20,6 +22,7 @@ class SavedHabitsSummary {
       'energy': energy,
       'snackAnxiety': snackAnxiety,
       'savedAtText': savedAtText,
+      'savedAtIso': savedAtIso,
     };
   }
 
@@ -30,6 +33,7 @@ class SavedHabitsSummary {
       energy: json['energy'] as int? ?? 0,
       snackAnxiety: json['snackAnxiety'] as int? ?? 0,
       savedAtText: json['savedAtText'] as String? ?? '',
+      savedAtIso: json['savedAtIso'] as String?,
     );
   }
 }
