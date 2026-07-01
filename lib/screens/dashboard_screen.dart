@@ -11,6 +11,7 @@ import '../widgets/dashboard_card.dart';
 import '../widgets/main_status_card.dart';
 import '../widgets/metric_box.dart';
 import '../widgets/section_title.dart';
+import 'exercise_library_screen.dart';
 import 'habits_history_screen.dart';
 import 'habits_screen.dart';
 import 'nutrition_screen.dart';
@@ -70,6 +71,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => const HabitsHistoryScreen(),
+      ),
+    );
+  }
+
+  void _goToExerciseLibrary(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const ExerciseLibraryScreen(),
       ),
     );
   }
@@ -518,6 +527,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   title: 'Registrar agua y pasos',
                   subtitle: 'Registro básico de hábitos diarios.',
                   onTap: () => _goToHabits(context),
+                ),
+                ActionTile(
+                  icon: Icons.menu_book_outlined,
+                  title: 'Biblioteca de ejercicios',
+                  subtitle: 'Consulta técnica, errores comunes y alternativas.',
+                  onTap: () => _goToExerciseLibrary(context),
                 ),
                 ActionTile(
                   icon: Icons.history,
