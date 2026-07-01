@@ -176,7 +176,7 @@ const exerciseDatabase = [
     ],
     safetyNote:
         'Usa los seguros de la máquina y evita rangos que provoquen dolor en rodilla, cadera o espalda.',
-    imageAsset: 'assets/exercises/prensa_piernas.png',
+    imageAsset: 'assets/exercises/prensa_de_piernas.png',
   ),
   ExerciseLibraryItem(
     id: 'sentadilla_goblet',
