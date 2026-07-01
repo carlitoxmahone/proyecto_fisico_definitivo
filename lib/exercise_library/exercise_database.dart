@@ -349,7 +349,7 @@ const exerciseDatabase = [
     ],
     safetyNote:
         'Evita bloquear con violencia y ajusta la carga si notas molestias en codos.',
-    imageAsset: 'assets/exercises/triceps_polea_cuerda.png',
+    imageAsset: 'assets/exercises/triceps_polea.png',
   ),
   ExerciseLibraryItem(
     id: 'press_inclinado_mancuernas',
@@ -1223,7 +1223,7 @@ const exerciseDatabase = [
     ],
     safetyNote:
         'Si el hombro se siente incómodo, reduce recorrido o cambia a polea.',
-    imageAsset: 'assets/exercises/fondos_banco.png',
+    imageAsset: 'assets/exercises/fondos_en_banco.png',
   ),
   ExerciseLibraryItem(
     id: 'plancha',
