@@ -70,7 +70,7 @@ const exerciseDatabase = [
     ],
     safetyNote:
         'Entrena con topes o ayuda externa si usas cargas exigentes; no fuerces repeticiones dudosas.',
-    imageAsset: 'assets/exercises/press_banca_barra.png',
+    imageAsset: 'assets/exercises/press_banca_con_barra.png',
   ),
   ExerciseLibraryItem(
     id: 'jalon_al_pecho',
@@ -563,7 +563,7 @@ const exerciseDatabase = [
     ],
     safetyNote:
         'Si pierdes estabilidad lumbar, baja la carga o usa una variante con apoyo.',
-    imageAsset: 'assets/exercises/remo_mancuerna.png',
+    imageAsset: 'assets/exercises/remo_con_mancuerna.png',
   ),
   ExerciseLibraryItem(
     id: 'remo_maquina',

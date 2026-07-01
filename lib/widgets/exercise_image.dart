@@ -5,10 +5,12 @@ class ExerciseImage extends StatelessWidget {
     super.key,
     required this.imageAsset,
     this.height,
+    this.fit = BoxFit.contain,
   });
 
   final String imageAsset;
   final double? height;
+  final BoxFit fit;
 
   @override
   Widget build(BuildContext context) {
@@ -24,12 +26,12 @@ class ExerciseImage extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: SizedBox(
         width: double.infinity,
-        height: height,
+        height: height ?? 460,
         child: AspectRatio(
-          aspectRatio: 16 / 9,
+          aspectRatio: 4 / 3,
           child: Image.asset(
             imageAsset,
-            fit: BoxFit.cover,
+            fit: fit,
             errorBuilder: (context, error, stackTrace) {
               return _ExerciseImagePlaceholder(imageAsset: imageAsset);
             },
