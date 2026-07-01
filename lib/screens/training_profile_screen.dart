@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../knowledge/training_knowledge_service.dart';
 import '../models/training_profile.dart';
 import '../services/local_storage_service.dart';
 import '../widgets/dashboard_card.dart';
@@ -54,6 +55,7 @@ class _TrainingProfileScreenState extends State<TrainingProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final profile = _profile;
+    final rule = TrainingKnowledgeService.ruleForProfile(profile);
 
     return Scaffold(
       appBar: AppBar(
@@ -112,12 +114,13 @@ class _TrainingProfileScreenState extends State<TrainingProfileScreen> {
                 const SizedBox(height: 18),
                 DashboardCard(
                   icon: Icons.psychology_alt_outlined,
-                  title: 'Enfoque actual recomendado',
-                  description: profile.recommendedFocus,
+                  title: 'Base del entrenador',
+                  description:
+                      'Objetivo: ${rule.goal} · ${rule.level}. Rango base: ${rule.mainRepRange} reps principales / ${rule.accessoryRepRange} reps accesorios. Enfoque: ${rule.priority}. Progresión: ${rule.progressionMethod}. Seguridad: ${rule.safetyNotes}.',
                   chips: [
-                    profile.goal,
-                    profile.level,
-                    profile.priority,
+                    rule.loadFocus,
+                    rule.restRecommendation,
+                    'Fuentes: ${rule.sourceIds.length}',
                   ],
                 ),
                 const SizedBox(height: 12),

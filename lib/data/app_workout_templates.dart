@@ -16,6 +16,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Baja controlado, no bloquees las rodillas y mantén la espalda pegada al respaldo.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Sentadilla en multipower suave',
@@ -44,6 +45,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Lleva la barra hacia la parte alta del pecho, sin balancearte y juntando escápulas.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Jalón con agarre cómodo',
@@ -72,6 +74,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Empuja fuerte, controla la bajada y evita que los hombros se vayan hacia delante.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Press convergente en máquina',
@@ -193,6 +196,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Baja hasta donde controles bien. Rodillas estables y torso firme.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Prensa de piernas',
@@ -221,6 +225,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Pecho apoyado si es posible. Tira con codos y evita encoger hombros.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Remo sentado en polea',
@@ -249,6 +254,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Controla la bajada y no fuerces el hombro. Rango cómodo y estable.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Press de pecho en máquina',
@@ -370,6 +376,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Cadera atrás, espalda neutra y mancuernas pegadas al cuerpo. Sin dolor lumbar.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Curl femoral sentado o tumbado',
@@ -398,6 +405,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'Usa el agarre que no moleste hombros. Baja controlado hacia el pecho.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Jalón al pecho',
@@ -426,6 +434,7 @@ class AppWorkoutTemplates {
         rest: '90 s',
         techniqueNote:
             'No busques máximo peso. Estabilidad, control y hombros protegidos.',
+        exerciseRole: 'principal',
         alternatives: [
           ExerciseAlternative(
             name: 'Press de pecho en máquina',
@@ -562,4 +571,3 @@ class AppWorkoutTemplates {
     ],
   );
 }
-

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../knowledge/training_knowledge_service.dart';
 import '../models/saved_habits_summary.dart';
 import '../models/saved_workout_summary.dart';
 import '../models/training_profile.dart';
@@ -93,6 +94,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     TrainingProfile profile,
     bool hasSavedProfile,
   ) {
+    final rule = TrainingKnowledgeService.ruleForProfile(profile);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -108,12 +111,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ? 'Perfil de entrenamiento'
               : 'Define tu perfil de entrenamiento',
           description: hasSavedProfile
-              ? profile.recommendedFocus
+              ? 'Rango orientativo: ${rule.mainRepRange} reps principales / ${rule.accessoryRepRange} reps accesorios. Enfoque recomendado: ${rule.priority}.'
               : 'Define tu perfil de entrenamiento para que la app pueda adaptar mejor las decisiones.',
           chips: [
             'Objetivo: ${profile.goal}',
             'Nivel: ${profile.level}',
             'Prioridad: ${profile.priority}',
+            'Carga: ${rule.loadFocus}',
           ],
         ),
         const SizedBox(height: 10),

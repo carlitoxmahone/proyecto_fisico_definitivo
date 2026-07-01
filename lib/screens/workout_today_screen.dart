@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../knowledge/training_goal_rules.dart';
+import '../knowledge/training_knowledge_service.dart';
 import '../models/exercise_performance_log.dart';
 import '../models/exercise_set_log.dart';
 import '../models/saved_workout_summary.dart';
+import '../models/training_profile.dart';
 import '../models/user_assessment_data.dart';
 import '../models/workout_exercise.dart';
 import '../models/workout_log_data.dart';
@@ -37,6 +40,8 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   bool _hasPain = false;
   bool _cardioCompleted = false;
 
+  TrainingProfile _trainingProfile = TrainingProfile.defaultProfile;
+  late TrainingGoalRule _trainingRule;
   late List<WorkoutExercise> _currentExercises;
   late List<List<TextEditingController>> _kgControllers;
   late List<List<TextEditingController>> _repsControllers;
@@ -47,6 +52,8 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   @override
   void initState() {
     super.initState();
+    _trainingRule =
+        TrainingKnowledgeService.getRuleForProfile(_trainingProfile);
     _currentExercises = List<WorkoutExercise>.from(widget.workout.exercises);
     _kgControllers = _currentExercises
         .map(
@@ -64,6 +71,17 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
           ),
         )
         .toList();
+    _loadTrainingRule();
+  }
+
+  Future<void> _loadTrainingRule() async {
+    final profile = await LocalStorageService.getTrainingProfile();
+    if (!mounted) return;
+
+    setState(() {
+      _trainingProfile = profile;
+      _trainingRule = TrainingKnowledgeService.getRuleForProfile(profile);
+    });
   }
 
   @override
@@ -89,6 +107,12 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
 
   int _plannedSetCount(WorkoutExercise exercise) {
     return int.tryParse(exercise.sets) ?? 1;
+  }
+
+  String _repRangeFor(WorkoutExercise exercise) {
+    return exercise.exerciseRole == 'principal'
+        ? _trainingRule.mainRepRange
+        : _trainingRule.accessoryRepRange;
   }
 
   List<ExercisePerformanceLog> get performanceLogs {
@@ -292,6 +316,18 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                     schedule: hasNightShiftText,
                     workoutName: widget.workout.subtitle,
                   ),
+                  const SizedBox(height: 14),
+                  DashboardCard(
+                    icon: Icons.psychology_alt_outlined,
+                    title: 'Modo de entrenamiento',
+                    description:
+                        'Objetivo: ${_trainingProfile.goal} · ${_trainingProfile.level}. Principales: ${_trainingRule.mainRepRange} reps. Accesorios: ${_trainingRule.accessoryRepRange} reps. Enfoque: ${_trainingRule.priority}. Progresión: ${_trainingRule.progressionMethod}. Seguridad: ${_trainingRule.safetyNotes}.',
+                    chips: [
+                      _trainingRule.loadFocus,
+                      _trainingRule.restRecommendation,
+                      'Fuentes: ${_trainingRule.sourceIds.length}',
+                    ],
+                  ),
                   if (replacedExercisesCount > 0) ...[
                     const SizedBox(height: 14),
                     DashboardCard(
@@ -316,6 +352,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                         (entry) => ExerciseCard(
                           number: entry.key + 1,
                           exercise: entry.value,
+                          adaptedRepRange: _repRangeFor(entry.value),
                           kgControllers: _kgControllers[entry.key],
                           repsControllers: _repsControllers[entry.key],
                           onReplace: () => _replaceExercise(entry.key),

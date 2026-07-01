@@ -7,6 +7,7 @@ class ExerciseCard extends StatelessWidget {
   const ExerciseCard({
     required this.number,
     required this.exercise,
+    required this.adaptedRepRange,
     required this.kgControllers,
     required this.repsControllers,
     required this.onReplace,
@@ -14,6 +15,7 @@ class ExerciseCard extends StatelessWidget {
 
   final int number;
   final WorkoutExercise exercise;
+  final String adaptedRepRange;
   final List<TextEditingController> kgControllers;
   final List<TextEditingController> repsControllers;
   final VoidCallback onReplace;
@@ -79,7 +81,12 @@ class ExerciseCard extends StatelessWidget {
                     runSpacing: 8,
                     children: [
                       SmallChip(label: '${exercise.sets} series'),
-                      SmallChip(label: '${exercise.reps} reps'),
+                      SmallChip(label: '$adaptedRepRange reps'),
+                      SmallChip(
+                        label: exercise.exerciseRole == 'principal'
+                            ? 'Principal'
+                            : 'Accesorio',
+                      ),
                       SmallChip(label: 'Descanso ${exercise.rest}'),
                     ],
                   ),

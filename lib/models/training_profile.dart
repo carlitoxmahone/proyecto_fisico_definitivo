@@ -36,34 +36,6 @@ class TrainingProfile {
   final String level;
   final String priority;
 
-  String get recommendedFocus {
-    if (goal == 'Adaptación' && level == 'Principiante') {
-      return 'Construir técnica, adherencia y tolerancia al entrenamiento.';
-    }
-
-    if (goal == 'Hipertrofia' && level == 'Intermedio') {
-      return 'Aumentar volumen de trabajo y progresar con control.';
-    }
-
-    if (goal == 'Fuerza' && level == 'Intermedio') {
-      return 'Priorizar básicos, cargas altas controladas y descanso suficiente.';
-    }
-
-    if (goal == 'Recomposición') {
-      return 'Combinar fuerza, volumen moderado, cardio suave y adherencia nutricional.';
-    }
-
-    if (goal == 'Fuerza') {
-      return 'Consolidar técnica y progresar cargas solo cuando la ejecución sea estable.';
-    }
-
-    if (goal == 'Hipertrofia') {
-      return 'Construir volumen efectivo con control, recuperación y buena técnica.';
-    }
-
-    return 'Construir base de fuerza, adherencia y recomposición corporal.';
-  }
-
   String get explanation {
     return 'Futuras automatizaciones dependerán del perfil, objetivo actual, nivel, datos registrados, dolor, fatiga y adherencia.';
   }

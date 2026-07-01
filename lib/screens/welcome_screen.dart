@@ -69,7 +69,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 18),
                   Text(
-                    'MVP v0.3.0 — Perfil de entrenamiento',
+                    'MVP v0.3.1 — Base del entrenador aplicada',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 13,
