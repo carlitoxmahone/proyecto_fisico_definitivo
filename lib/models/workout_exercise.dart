@@ -23,7 +23,10 @@ class WorkoutExercise {
   final bool wasReplaced;
   final String? originalName;
 
-  WorkoutExercise replacedBy(ExerciseAlternative alternative) {
+  WorkoutExercise replacedBy(
+    ExerciseAlternative alternative, {
+    List<ExerciseAlternative>? alternatives,
+  }) {
     return WorkoutExercise(
       name: alternative.name,
       sets: sets,
@@ -31,7 +34,7 @@ class WorkoutExercise {
       rest: rest,
       techniqueNote: alternative.techniqueNote,
       exerciseRole: exerciseRole,
-      alternatives: alternatives,
+      alternatives: alternatives ?? this.alternatives,
       wasReplaced: true,
       originalName: originalName ?? name,
     );

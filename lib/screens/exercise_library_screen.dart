@@ -309,6 +309,8 @@ class _ExerciseDetailSheet extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 18),
+        _ExerciseImagePlaceholder(imageAsset: exercise.imageAsset),
+        const SizedBox(height: 14),
         _DetailBlock(
           title: 'Datos técnicos',
           children: [
@@ -322,10 +324,6 @@ class _ExerciseDetailSheet extends StatelessWidget {
             _DetailLine(
               label: 'Objetivos',
               value: exercise.compatibleGoals.join(', '),
-            ),
-            _DetailLine(
-              label: 'Imagen',
-              value: 'Imagen preparada: ${exercise.imageAsset}',
             ),
           ],
         ),
@@ -416,6 +414,62 @@ class _DetailBlock extends StatelessWidget {
             const SizedBox(height: 12),
             ...children,
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ExerciseImagePlaceholder extends StatelessWidget {
+  const _ExerciseImagePlaceholder({
+    required this.imageAsset,
+  });
+
+  final String imageAsset;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF101F1B),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(
+          color: const Color(0xFF00E0A4).withValues(alpha: 0.24),
+        ),
+      ),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.image_outlined,
+                color: Color(0xFF00E0A4),
+                size: 42,
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Imagen preparada',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                imageAsset,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 12.5,
+                  height: 1.35,
+                  color: Colors.white.withValues(alpha: 0.58),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

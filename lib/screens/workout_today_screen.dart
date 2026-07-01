@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../exercise_library/exercise_library_service.dart';
 import '../knowledge/training_goal_rules.dart';
 import '../knowledge/training_knowledge_service.dart';
 import '../models/exercise_performance_log.dart';
@@ -34,6 +35,7 @@ class WorkoutTodayScreen extends StatefulWidget {
 
 class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
   final _logFormKey = GlobalKey<FormState>();
+  static const _exerciseLibraryService = ExerciseLibraryService();
 
   String _feeling = 'Normal';
   double _difficulty = 5;
@@ -188,8 +190,16 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
 
   void _replaceExercise(int index) {
     final exercise = _currentExercises[index];
+    final smartAlternatives =
+        _exerciseLibraryService.getSmartAlternativesForWorkoutExercise(
+      workoutExercise: exercise,
+      profile: _trainingProfile,
+    );
+    final alternatives = smartAlternatives.isNotEmpty
+        ? smartAlternatives
+        : exercise.alternatives;
 
-    if (exercise.alternatives.isEmpty) {
+    if (alternatives.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Este ejercicio aún no tiene alternativas.'),
@@ -216,7 +226,9 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Elige una alternativa si la máquina está ocupada, no tienes el material o notas molestia.',
+                smartAlternatives.isNotEmpty
+                    ? 'Alternativas sugeridas por músculo, patrón, rol, objetivo, nivel y equipamiento.'
+                    : 'Elige una alternativa si la máquina está ocupada, no tienes el material o notas molestia.',
                 style: TextStyle(
                   fontSize: 15,
                   height: 1.4,
@@ -224,7 +236,7 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                 ),
               ),
               const SizedBox(height: 18),
-              ...exercise.alternatives.map(
+              ...alternatives.map(
                 (alternative) => Card(
                   color: const Color(0xFF121821),
                   elevation: 0,
@@ -251,8 +263,10 @@ class _WorkoutTodayScreenState extends State<WorkoutTodayScreen> {
                     ),
                     onTap: () {
                       setState(() {
-                        _currentExercises[index] =
-                            exercise.replacedBy(alternative);
+                        _currentExercises[index] = exercise.replacedBy(
+                          alternative,
+                          alternatives: alternatives,
+                        );
                       });
 
                       Navigator.of(context).pop();
