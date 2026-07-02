@@ -23,9 +23,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Historial de entrenamientos'),
-      ),
+      appBar: AppBar(title: const Text('Historial de entrenamientos')),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -81,23 +79,32 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
 }
 
 class _WorkoutHistoryCard extends StatelessWidget {
-  const _WorkoutHistoryCard({
-    required this.summary,
-  });
+  const _WorkoutHistoryCard({required this.summary});
 
   final SavedWorkoutSummary summary;
 
   @override
   Widget build(BuildContext context) {
+    final chips = [
+      _HistoryChip(label: 'Sensación: ${summary.feeling}'),
+      _HistoryChip(label: 'Dificultad ${summary.difficulty}/10'),
+      _HistoryChip(label: summary.cardioCompleted ? 'Cardio sí' : 'Cardio no'),
+      if (summary.isFreeWorkout) ...[
+        _HistoryChip(label: 'Ejercicios: ${summary.registeredExerciseCount}'),
+        _HistoryChip(label: 'Series: ${summary.registeredSetCount}'),
+      ] else
+        _HistoryChip(label: 'Cambios: ${summary.replacedExercisesCount}'),
+      _HistoryChip(label: 'Rendimiento: ${summary.registeredPerformanceCount}'),
+      _HistoryChip(label: summary.hasPain ? 'Con molestia' : 'Sin molestia'),
+    ];
+
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
       color: const Color(0xFF121821),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(
-          color: Colors.white.withValues(alpha: 0.08),
-        ),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -106,10 +113,7 @@ class _WorkoutHistoryCard extends StatelessWidget {
           children: [
             Text(
               summary.workoutName,
-              style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w900,
-              ),
+              style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 6),
             Text(
@@ -120,27 +124,7 @@ class _WorkoutHistoryCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                _HistoryChip(label: 'Sensación: ${summary.feeling}'),
-                _HistoryChip(label: 'Dificultad ${summary.difficulty}/10'),
-                _HistoryChip(
-                  label: summary.cardioCompleted ? 'Cardio sí' : 'Cardio no',
-                ),
-                _HistoryChip(
-                  label: 'Cambios: ${summary.replacedExercisesCount}',
-                ),
-                _HistoryChip(
-                  label:
-                      'Rendimiento: ${summary.registeredPerformanceCount}',
-                ),
-                _HistoryChip(
-                  label: summary.hasPain ? 'Con molestia' : 'Sin molestia',
-                ),
-              ],
-            ),
+            Wrap(spacing: 8, runSpacing: 8, children: chips),
           ],
         ),
       ),
@@ -149,9 +133,7 @@ class _WorkoutHistoryCard extends StatelessWidget {
 }
 
 class _HistoryChip extends StatelessWidget {
-  const _HistoryChip({
-    required this.label,
-  });
+  const _HistoryChip({required this.label});
 
   final String label;
 
@@ -160,9 +142,7 @@ class _HistoryChip extends StatelessWidget {
     return Chip(
       label: Text(label),
       backgroundColor: const Color(0xFF00E0A4).withValues(alpha: 0.10),
-      side: BorderSide(
-        color: const Color(0xFF00E0A4).withValues(alpha: 0.16),
-      ),
+      side: BorderSide(color: const Color(0xFF00E0A4).withValues(alpha: 0.16)),
     );
   }
 }

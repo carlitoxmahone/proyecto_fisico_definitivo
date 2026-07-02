@@ -12,6 +12,7 @@ import '../widgets/main_status_card.dart';
 import '../widgets/metric_box.dart';
 import '../widgets/section_title.dart';
 import 'exercise_library_screen.dart';
+import 'free_workout_screen.dart';
 import 'habits_history_screen.dart';
 import 'habits_screen.dart';
 import 'nutrition_screen.dart';
@@ -21,10 +22,7 @@ import 'welcome_screen.dart';
 import 'workout_history_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({
-    super.key,
-    required this.data,
-  });
+  const DashboardScreen({super.key, required this.data});
 
   final UserAssessmentData data;
 
@@ -36,51 +34,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
   UserAssessmentData get data => widget.data;
 
   void _goToNutrition(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => NutritionScreen(data: data),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => NutritionScreen(data: data)));
   }
 
   void _goToHabits(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => HabitsScreen(data: data),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => HabitsScreen(data: data)));
   }
 
   void _goToWeeklyPlan(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => WeeklyPlanScreen(data: data),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => WeeklyPlanScreen(data: data)));
   }
 
   void _goToWorkoutHistory(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const WorkoutHistoryScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const WorkoutHistoryScreen()));
   }
 
   void _goToHabitsHistory(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const HabitsHistoryScreen(),
-      ),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const HabitsHistoryScreen()));
   }
 
   void _goToExerciseLibrary(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const ExerciseLibraryScreen(),
-      ),
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ExerciseLibraryScreen()));
+  }
+
+  Future<void> _goToFreeWorkout(BuildContext context) async {
+    final saved = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => FreeWorkoutScreen(data: data)),
     );
+
+    if (!mounted || saved != true) return;
+    setState(() {});
   }
 
   Future<void> _goToTrainingProfile(
@@ -89,9 +84,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ) async {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(
-        builder: (_) => TrainingProfileScreen(
-          initialProfile: profile,
-        ),
+        builder: (_) => TrainingProfileScreen(initialProfile: profile),
       ),
     );
 
@@ -157,19 +150,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         const SizedBox(height: 12),
         if (lastWorkout != null) ...[
-          DashboardCard(
-            icon: Icons.fitness_center_outlined,
-            title: 'Último entrenamiento registrado',
-            description:
-                '${lastWorkout.workoutName} · ${lastWorkout.savedAtText}',
-            chips: [
-              'Sensación: ${lastWorkout.feeling}',
-              'Dificultad ${lastWorkout.difficulty}/10',
-              lastWorkout.cardioCompleted ? 'Cardio sí' : 'Cardio no',
-              'Cambios: ${lastWorkout.replacedExercisesCount}',
-              'Rendimiento: ${lastWorkout.registeredPerformanceCount}',
-              lastWorkout.hasPain ? 'Con molestia' : 'Sin molestia',
-            ],
+          Builder(
+            builder: (context) {
+              final workoutChips = [
+                'Sensación: ${lastWorkout.feeling}',
+                'Dificultad ${lastWorkout.difficulty}/10',
+                lastWorkout.cardioCompleted ? 'Cardio sí' : 'Cardio no',
+                if (lastWorkout.isFreeWorkout) ...[
+                  'Ejercicios: ${lastWorkout.registeredExerciseCount}',
+                  'Series: ${lastWorkout.registeredSetCount}',
+                ] else
+                  'Cambios: ${lastWorkout.replacedExercisesCount}',
+                'Rendimiento: ${lastWorkout.registeredPerformanceCount}',
+                lastWorkout.hasPain ? 'Con molestia' : 'Sin molestia',
+              ];
+
+              return DashboardCard(
+                icon: Icons.fitness_center_outlined,
+                title: 'Último entrenamiento registrado',
+                description:
+                    '${lastWorkout.workoutName} · ${lastWorkout.savedAtText}',
+                chips: workoutChips,
+              );
+            },
           ),
           const SizedBox(height: 12),
         ],
@@ -227,17 +230,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return _WeeklyGoalsSummary(
       workoutsDone: workoutsThisWeek.length,
-      cardioDone:
-          workoutsThisWeek.where((item) => item.cardioCompleted).length,
+      cardioDone: workoutsThisWeek.where((item) => item.cardioCompleted).length,
       habitsDone: habitsThisWeek.length,
       waterDone: (lastHabits?.waterGlasses ?? 0) >= 8,
       stepsDone: (lastHabits?.steps ?? 0) >= 3500,
     );
   }
 
-  String _motivationMessage(
-    _WeeklyGoalsSummary weeklyGoals,
-  ) {
+  String _motivationMessage(_WeeklyGoalsSummary weeklyGoals) {
     final missingWorkouts = 3 - weeklyGoals.workoutsDone;
 
     if (weeklyGoals.workoutsDone == 0) {
@@ -291,36 +291,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
       habitsHistory,
       lastHabits,
     );
-    final workoutsDone =
-        weeklyGoals.workoutsDone.clamp(0, workoutGoal).toInt();
+    final workoutsDone = weeklyGoals.workoutsDone.clamp(0, workoutGoal).toInt();
     final cardioDone = weeklyGoals.cardioDone.clamp(0, cardioGoal).toInt();
     final habitsDone = weeklyGoals.habitsDone.clamp(0, habitsGoal).toInt();
-    final streak =
-        (workoutHistory.length + habitsHistory.length).clamp(0, 7).toInt();
+    final streak = (workoutHistory.length + habitsHistory.length)
+        .clamp(0, 7)
+        .toInt();
     final cardioCompleted = lastWorkout?.cardioCompleted ?? false;
     final waterGlasses = lastHabits?.waterGlasses ?? 0;
     final steps = lastHabits?.steps ?? 0;
     final recommendedTitle = weeklyGoals.workoutsDone < workoutGoal
         ? 'Ir al plan semanal'
         : weeklyGoals.habitsDone < habitsGoal
-            ? 'Registrar hábitos de hoy'
-            : weeklyGoals.cardioDone < cardioGoal
-                ? 'Sumar cardio suave'
-                : 'Revisar historial/progreso';
+        ? 'Registrar hábitos de hoy'
+        : weeklyGoals.cardioDone < cardioGoal
+        ? 'Sumar cardio suave'
+        : 'Revisar historial/progreso';
     final recommendedDescription = weeklyGoals.workoutsDone < workoutGoal
         ? 'Elige Día 1, 3 o 5 y suma una sesión de fuerza.'
         : weeklyGoals.habitsDone < habitsGoal
-            ? 'Añade agua, pasos y energía para completar la foto del día.'
-            : weeklyGoals.cardioDone < cardioGoal
-                ? 'Camina a ritmo cómodo y refuerza la base de la semana.'
-                : 'Revisa tus registros recientes y consolida el progreso.';
+        ? 'Añade agua, pasos y energía para completar la foto del día.'
+        : weeklyGoals.cardioDone < cardioGoal
+        ? 'Camina a ritmo cómodo y refuerza la base de la semana.'
+        : 'Revisa tus registros recientes y consolida el progreso.';
     final recommendedAction = weeklyGoals.workoutsDone < workoutGoal
         ? () => _goToWeeklyPlan(context)
         : weeklyGoals.habitsDone < habitsGoal
-            ? () => _goToHabits(context)
-            : weeklyGoals.cardioDone < cardioGoal
-                ? () => _goToWeeklyPlan(context)
-                : () => _goToWorkoutHistory(context);
+        ? () => _goToHabits(context)
+        : weeklyGoals.cardioDone < cardioGoal
+        ? () => _goToWeeklyPlan(context)
+        : () => _goToWorkoutHistory(context);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,17 +349,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: _MotivationCard(
-                message: _motivationMessage(weeklyGoals),
-              ),
+              child: _MotivationCard(message: _motivationMessage(weeklyGoals)),
             ),
           ],
         ),
         const SizedBox(height: 18),
-        const SectionTitle(
-          icon: Icons.bolt_outlined,
-          title: 'Estado de hoy',
-        ),
+        const SectionTitle(icon: Icons.bolt_outlined, title: 'Estado de hoy'),
         const SizedBox(height: 12),
         Wrap(
           spacing: 12,
@@ -456,10 +451,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         values?[2] as List<SavedWorkoutSummary>? ?? [];
                     final habitsHistory =
                         values?[3] as List<SavedHabitsSummary>? ?? [];
-                    final savedTrainingProfile =
-                        values?[4] as TrainingProfile?;
-                    final trainingProfile = savedTrainingProfile ??
-                        TrainingProfile.defaultProfile;
+                    final savedTrainingProfile = values?[4] as TrainingProfile?;
+                    final trainingProfile =
+                        savedTrainingProfile ?? TrainingProfile.defaultProfile;
 
                     return Column(
                       children: [
@@ -515,6 +509,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   title: 'Elegir entrenamiento de hoy',
                   subtitle: 'Abre el plan semanal y selecciona Día 1, 3 o 5.',
                   onTap: () => _goToWeeklyPlan(context),
+                ),
+                ActionTile(
+                  icon: Icons.add_circle_outline,
+                  title: 'Registrar entrenamiento libre',
+                  subtitle:
+                      'Elige ejercicios de la biblioteca y apunta kg/reps.',
+                  onTap: () => _goToFreeWorkout(context),
                 ),
                 ActionTile(
                   icon: Icons.restaurant_outlined,
@@ -585,9 +586,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 OutlinedButton(
                   onPressed: () {
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (_) => const WelcomeScreen(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const WelcomeScreen()),
                       (route) => false,
                     );
                   },
@@ -655,10 +654,7 @@ class _WeeklyProgressCard extends StatelessWidget {
                 SizedBox(width: 12),
                 Text(
                   'Objetivos de la semana',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
                 ),
               ],
             ),
@@ -723,10 +719,7 @@ class _WeeklyGoalsSummary {
 }
 
 class _GoalStateChip extends StatelessWidget {
-  const _GoalStateChip({
-    required this.label,
-    required this.done,
-  });
+  const _GoalStateChip({required this.label, required this.done});
 
   final String label;
   final bool done;
@@ -743,9 +736,7 @@ class _GoalStateChip extends StatelessWidget {
       ),
       label: Text(label),
       backgroundColor: color.withValues(alpha: 0.10),
-      side: BorderSide(
-        color: color.withValues(alpha: 0.18),
-      ),
+      side: BorderSide(color: color.withValues(alpha: 0.18)),
     );
   }
 }
@@ -774,10 +765,7 @@ class _ProgressLine extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.w800),
               ),
             ),
-            Text(
-              value,
-              style: const TextStyle(fontWeight: FontWeight.w900),
-            ),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w900)),
           ],
         ),
         const SizedBox(height: 8),
@@ -796,10 +784,7 @@ class _ProgressLine extends StatelessWidget {
 }
 
 class _StreakCard extends StatelessWidget {
-  const _StreakCard({
-    required this.streak,
-    required this.message,
-  });
+  const _StreakCard({required this.streak, required this.message});
 
   final int streak;
   final String message;
@@ -816,9 +801,7 @@ class _StreakCard extends StatelessWidget {
 }
 
 class _MotivationCard extends StatelessWidget {
-  const _MotivationCard({
-    required this.message,
-  });
+  const _MotivationCard({required this.message});
 
   final String message;
 
@@ -853,20 +836,14 @@ class _CompactVisualCard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(
-          color: Colors.white.withValues(alpha: 0.08),
-        ),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              icon,
-              color: const Color(0xFF00E0A4),
-              size: 30,
-            ),
+            Icon(icon, color: const Color(0xFF00E0A4), size: 30),
             const SizedBox(height: 10),
             Text(
               title,
@@ -879,10 +856,7 @@ class _CompactVisualCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w900,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 6),
             Text(
@@ -922,32 +896,22 @@ class _StatusIndicatorCard extends StatelessWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),
-          side: BorderSide(
-            color: Colors.white.withValues(alpha: 0.08),
-          ),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                icon,
-                color: const Color(0xFF00E0A4),
-              ),
+              Icon(icon, color: const Color(0xFF00E0A4)),
               const SizedBox(height: 10),
-              Text(
-                title,
-                style: const TextStyle(fontWeight: FontWeight.w900),
-              ),
+              Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
               const SizedBox(height: 4),
               Text(
                 value,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.68),
-                ),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.68)),
               ),
               const SizedBox(height: 10),
               ClipRRect(
@@ -993,11 +957,7 @@ class _RecommendedActionCard extends StatelessWidget {
         padding: const EdgeInsets.all(18),
         child: Row(
           children: [
-            const Icon(
-              Icons.flag_outlined,
-              color: Color(0xFF00E0A4),
-              size: 32,
-            ),
+            const Icon(Icons.flag_outlined, color: Color(0xFF00E0A4), size: 32),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
@@ -1031,10 +991,7 @@ class _RecommendedActionCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            FilledButton(
-              onPressed: onPressed,
-              child: const Text('Abrir'),
-            ),
+            FilledButton(onPressed: onPressed, child: const Text('Abrir')),
           ],
         ),
       ),
